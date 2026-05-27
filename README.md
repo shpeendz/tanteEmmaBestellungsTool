@@ -135,3 +135,10 @@ flowchart LR
     UC8 -. "include" .- UC11
     UC9 -. "include" .- UC10
     UC13 -. "include" .- UC12
+
+
+
+1. models.py      ← Tabellen (wie geplant)
+2. app.py         ← Flask + db.create_all()
+3. routes/        ← eine Datei pro Bereich
+4. static/        ← HTML + JS Frontend
