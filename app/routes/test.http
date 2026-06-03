@@ -1,0 +1,13 @@
+### Alle Artikel holen
+GET http://127.0.0.1:5000/api/artikel
+
+### Neuen Artikel erstellen
+POST http://127.0.0.1:5000/api/artikel
+Content-Type: application/json
+
+{
+  "bezeichnung": "Butter 250g",
+  "preis": 1.49,
+  "bestand": 30,
+  "kategorie": "Milch"
+}
