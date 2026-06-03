@@ -1,7 +1,12 @@
 import os
 from flask import Flask
-from models import db, Lieferant
+
+from routes.bestellungen import bestellungen_bp
+from routes.kunden import kunden_bp
+from routes.lieferungen import lieferungen_bp
 from routes.artikel import artikel_bp
+from models import db, Lieferant
+
 
 app = Flask(__name__)
 
@@ -15,6 +20,12 @@ app.secret_key = 'tante-emma-dev'
 db.init_app(app)
 
 app.register_blueprint(artikel_bp)
+app.register_blueprint(bestellungen_bp)
+app.register_blueprint(kunden_bp)
+app.register_blueprint(lieferungen_bp)
+
+
+
 
 @app.route('/')
 def index():

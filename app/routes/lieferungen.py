@@ -1,10 +1,14 @@
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from flask import Blueprint, jsonify
-from app.models import Lieferung
+
+from models import Lieferung
 
 lieferungen_bp = Blueprint("lieferungen", __name__)
 
 
-@lieferungen_bp.route("/")
+@lieferungen_bp.route("/api/lieferungen", methods=["GET"])
 def get_lieferungen():
     lieferungen = Lieferung.query.all()
 

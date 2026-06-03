@@ -1,5 +1,9 @@
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from flask import Blueprint, jsonify
-from app.models import Kunde
+
+from models import Kunde
 
 kunden_bp = Blueprint("kunden", __name__)
 
@@ -9,7 +13,7 @@ def get_kunden():
 
     return jsonify([
         {
-            "id": k.KundenID,
+            "id": k.KundeID,
             "vorname": k.Vorname,
             "nachname": k.Nachname,
             "email": k.Email,
