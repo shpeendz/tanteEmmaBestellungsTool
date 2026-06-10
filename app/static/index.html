@@ -1,168 +1,248 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tante Emma System</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <title>Tante Emma Shop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
 </head>
 
-<body>
+<body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col">
 
-<header>
-    <h1>🛒 Tante Emma Shop</h1>
-    <p>Bestellsystem – Flask API</p>
+<!-- HEADER -->
+<header class="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
+    <div class="flex items-center gap-3">
+        <div class="bg-teal-500 rounded-lg w-8 h-8 flex items-center justify-center text-black font-bold text-sm">T</div>
+        <h1 class="text-lg font-semibold">Tante Emma Shop</h1>
+    </div>
+    <button onclick="toggleWarenkorb()"
+        class="relative flex items-center gap-2 bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg text-sm transition">
+        🛒 Warenkorb
+        <span id="warenkorb-anzahl"
+            class="bg-teal-500 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+            0
+        </span>
+    </button>
 </header>
 
-<nav>
-    <button onclick="loadArtikel()">🛒 Artikel</button>
-    <button onclick="loadKunden()">👤 Kunden</button>
-    <button onclick="loadBestellungen()">📦 Bestellungen</button>
-    <button onclick="loadLieferungen()">🚚 Lieferungen</button>
-</nav>
+<!-- LAYOUT -->
+<div class="flex flex-1">
 
-<main>
-    <section class="card">
-        <h2 id="bereich-titel">Willkommen</h2>
-        <div id="output">Klicke oben auf einen Button...</div>
-    </section>
-</main>
+    <!-- ARTIKEL BEREICH -->
+    <main class="flex-1 p-6">
+        <h2 class="text-xl font-semibold mb-6">Unser Sortiment</h2>
 
-<footer>
-    <p>Flask + SQLite + REST API</p>
-</footer>
+        <!-- Artikel Kacheln -->
+        <div id="artikel-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <p class="text-gray-500 text-sm">Lädt Artikel...</p>
+        </div>
+    </main>
+
+    <!-- WARENKORB SIDEBAR -->
+    <aside id="warenkorb-panel"
+        class="hidden w-80 bg-gray-900 border-l border-gray-800 p-5 flex flex-col">
+        <h2 class="text-base font-semibold mb-4">🛒 Warenkorb</h2>
+
+        <div id="warenkorb-liste" class="flex-1 flex flex-col gap-2 overflow-y-auto">
+            <p class="text-gray-500 text-sm">Noch nichts im Warenkorb.</p>
+        </div>
+
+        <div class="border-t border-gray-800 pt-4 mt-4">
+            <div class="flex justify-between text-sm mb-4">
+                <span class="text-gray-400">Gesamt</span>
+                <span class="font-bold text-teal-400" id="warenkorb-gesamt">0.00 €</span>
+            </div>
+
+            <!-- Bestellung aufgeben -->
+            <div class="flex flex-col gap-2 mb-3">
+                <input id="kunde-name" type="text" placeholder="Dein Name"
+                    class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm w-full focus:outline-none focus:border-teal-500">
+                <input id="kunde-email" type="email" placeholder="Deine E-Mail"
+                    class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm w-full focus:outline-none focus:border-teal-500">
+            </div>
+
+            <button onclick="bestellungAufgeben()"
+                class="w-full bg-teal-500 hover:bg-teal-400 text-black font-semibold py-2 rounded-lg text-sm transition">
+                Bestellung aufgeben
+            </button>
+            <button onclick="warenkorbLeeren()"
+                class="w-full mt-2 text-gray-500 hover:text-gray-300 text-xs transition">
+                Warenkorb leeren
+            </button>
+        </div>
+    </aside>
+
+</div>
+
+<!-- ERFOLG MODAL -->
+<div id="erfolg-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-8 max-w-sm w-full text-center">
+        <div class="text-5xl mb-4">🎉</div>
+        <h3 class="text-xl font-bold mb-2">Bestellung aufgegeben!</h3>
+        <p class="text-gray-400 text-sm mb-6">Deine Bestellung wurde erfolgreich gespeichert.</p>
+        <button onclick="schliesseModal()"
+            class="bg-teal-500 hover:bg-teal-400 text-black font-semibold px-6 py-2 rounded-lg text-sm transition">
+            Weiter einkaufen
+        </button>
+    </div>
+</div>
 
 <script>
-const output = document.getElementById("output");
-const titel  = document.getElementById("bereich-titel");
+let warenkorb = [];
 
-/* ---------------------------
-   ARTIKEL
----------------------------- */
-async function loadArtikel() {
-    titel.textContent = "🛒 Artikel";
-    const res  = await fetch("/api/artikel");
-    const data = await res.json();
-
-    output.innerHTML = `
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Bezeichnung</th>
-                    <th>Preis</th>
-                    <th>Bestand</th>
-                    <th>Kategorie</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${data.map(a => `
-                <tr>
-                    <td>${a.id}</td>
-                    <td>${a.bezeichnung}</td>
-                    <td>${a.preis.toFixed(2)} €</td>
-                    <td>${a.bestand}</td>
-                    <td>${a.kategorie ?? '–'}</td>
-                </tr>`).join('')}
-            </tbody>
-        </table>`;
+// Warenkorb ein/ausblenden
+function toggleWarenkorb() {
+    const panel = document.getElementById('warenkorb-panel');
+    panel.classList.toggle('hidden');
+    panel.classList.toggle('flex');
 }
 
-/* ---------------------------
-   KUNDEN
----------------------------- */
-async function loadKunden() {
-    titel.textContent = "👤 Kunden";
-    const res  = await fetch("/api/kunden");
-    const data = await res.json();
+// Artikel laden und als Kacheln anzeigen
+async function ladeArtikel() {
+    const data = await fetch("/api/artikel").then(r => r.json());
+    const grid = document.getElementById('artikel-grid');
 
-    output.innerHTML = `
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Vorname</th>
-                    <th>Nachname</th>
-                    <th>Email</th>
-                    <th>Telefon</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${data.map(k => `
-                <tr>
-                    <td>${k.id}</td>
-                    <td>${k.vorname}</td>
-                    <td>${k.nachname}</td>
-                    <td>${k.email}</td>
-                    <td>${k.telefon ?? '–'}</td>
-                </tr>`).join('')}
-            </tbody>
-        </table>`;
+    grid.innerHTML = data.map(a => `
+        <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col gap-3 hover:border-teal-700 transition">
+            <div class="bg-gray-800 rounded-lg h-24 flex items-center justify-center text-4xl">
+                ${kategorieIcon(a.kategorie)}
+            </div>
+            <div>
+                <h3 class="font-medium text-sm">${a.bezeichnung}</h3>
+                <p class="text-xs text-gray-500">${a.kategorie ?? '–'}</p>
+            </div>
+            <div class="flex items-center justify-between mt-auto">
+                <span class="text-teal-400 font-bold">${a.preis.toFixed(2)} €</span>
+                <span class="text-xs text-gray-600">Bestand: ${a.bestand}</span>
+            </div>
+            ${a.bestand > 0
+                ? `<button onclick="inWarenkorb(${a.id}, '${a.bezeichnung}', ${a.preis})"
+                    class="w-full bg-gray-800 hover:bg-teal-900 hover:text-teal-400 border border-gray-700 hover:border-teal-700 text-sm py-1.5 rounded-lg transition">
+                    + In den Warenkorb
+                   </button>`
+                : `<button disabled class="w-full bg-gray-800 text-gray-600 text-sm py-1.5 rounded-lg cursor-not-allowed">
+                    Nicht verfügbar
+                   </button>`
+            }
+        </div>
+    `).join('');
 }
 
-/* ---------------------------
-   BESTELLUNGEN
----------------------------- */
-async function loadBestellungen() {
-    titel.textContent = "📦 Bestellungen";
-    const res  = await fetch("/api/bestellungen");
-    const data = await res.json();
-
-    output.innerHTML = `
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Kunde</th>
-                    <th>Datum</th>
-                    <th>Status</th>
-                    <th>Wunschtermin</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${data.map(b => `
-                <tr>
-                    <td>${b.id}</td>
-                    <td>${b.kunde_id}</td>
-                    <td>${b.bestelldatum}</td>
-                    <td><span class="status ${b.status}">${b.status}</span></td>
-                    <td>${b.wunschtermin ?? '–'}</td>
-                </tr>`).join('')}
-            </tbody>
-        </table>`;
+// Icon je Kategorie
+function kategorieIcon(kat) {
+    const icons = {
+        'Obst': '🍎', 'Milch': '🥛', 'Bio': '🌿',
+        'Backwaren': '🍞', 'Trockenwaren': '🌾',
+        'Gemüse': '🥦', 'Fleisch': '🥩'
+    };
+    return icons[kat] ?? '📦';
 }
 
-/* ---------------------------
-   LIEFERUNGEN
----------------------------- */
-async function loadLieferungen() {
-    titel.textContent = "🚚 Lieferungen";
-    const res  = await fetch("/api/lieferungen");
-    const data = await res.json();
+// In Warenkorb legen
+function inWarenkorb(id, name, preis) {
+    const vorhanden = warenkorb.find(w => w.id === id);
+    if (vorhanden) {
+        vorhanden.menge++;
+    } else {
+        warenkorb.push({ id, name, preis, menge: 1 });
+    }
+    aktualisiereWarenkorb();
 
-    output.innerHTML = `
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Bestellung</th>
-                    <th>Mitarbeiter</th>
-                    <th>Lieferdatum</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${data.map(l => `
-                <tr>
-                    <td>${l.id}</td>
-                    <td>${l.bestellung_id}</td>
-                    <td>${l.mitarbeiter_id ?? '–'}</td>
-                    <td>${l.lieferdatum ?? '–'}</td>
-                    <td><span class="status ${l.status}">${l.status}</span></td>
-                </tr>`).join('')}
-            </tbody>
-        </table>`;
+    // Warenkorb öffnen falls zu
+    const panel = document.getElementById('warenkorb-panel');
+    if (panel.classList.contains('hidden')) toggleWarenkorb();
 }
+
+// Warenkorb anzeigen
+function aktualisiereWarenkorb() {
+    const liste  = document.getElementById('warenkorb-liste');
+    const anzahl = document.getElementById('warenkorb-anzahl');
+    const gesamt = document.getElementById('warenkorb-gesamt');
+
+    const total = warenkorb.reduce((s, w) => s + w.preis * w.menge, 0);
+    gesamt.textContent = total.toFixed(2) + ' €';
+    anzahl.textContent = warenkorb.reduce((s, w) => s + w.menge, 0);
+
+    if (warenkorb.length === 0) {
+        liste.innerHTML = '<p class="text-gray-500 text-sm">Noch nichts im Warenkorb.</p>';
+        return;
+    }
+
+    liste.innerHTML = warenkorb.map(w => `
+        <div class="flex items-center justify-between bg-gray-800 rounded-lg px-3 py-2 text-sm">
+            <div>
+                <p class="font-medium">${w.name}</p>
+                <p class="text-xs text-gray-500">${w.preis.toFixed(2)} € × ${w.menge}</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-teal-400 text-xs font-bold">${(w.preis * w.menge).toFixed(2)} €</span>
+                <button onclick="entferneAusWarenkorb(${w.id})" class="text-gray-600 hover:text-red-400 transition text-lg leading-none">×</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Artikel aus Warenkorb entfernen
+function entferneAusWarenkorb(id) {
+    warenkorb = warenkorb.filter(w => w.id !== id);
+    aktualisiereWarenkorb();
+}
+
+// Warenkorb leeren
+function warenkorbLeeren() {
+    warenkorb = [];
+    aktualisiereWarenkorb();
+}
+
+// Bestellung aufgeben
+async function bestellungAufgeben() {
+    if (warenkorb.length === 0) {
+        alert('Warenkorb ist leer!');
+        return;
+    }
+
+    const name  = document.getElementById('kunde-name').value.trim();
+    const email = document.getElementById('kunde-email').value.trim();
+
+    if (!name || !email) {
+        alert('Bitte Name und E-Mail eingeben!');
+        return;
+    }
+
+    const bestellung = {
+        kunde_name:  name,
+        kunde_email: email,
+        positionen:  warenkorb.map(w => ({
+            artikel_id: w.id,
+            menge:      w.menge,
+            preis:      w.preis
+        }))
+    };
+
+    const res = await fetch("/api/bestellungen", {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(bestellung)
+    });
+
+    if (res.ok) {
+        warenkorbLeeren();
+        document.getElementById('kunde-name').value  = '';
+        document.getElementById('kunde-email').value = '';
+        document.getElementById('erfolg-modal').classList.remove('hidden');
+    } else {
+        alert('Fehler beim Aufgeben der Bestellung!');
+    }
+}
+
+// Erfolgsmodal schließen
+function schliesseModal() {
+    document.getElementById('erfolg-modal').classList.add('hidden');
+}
+
+// Start
+ladeArtikel();
 </script>
 
 </body>
