@@ -1,4 +1,6 @@
 import os
+import time
+import pymysql
 from flask import Flask, send_from_directory
 from flask_cors import CORS
 
@@ -12,39 +14,63 @@ app = Flask(__name__)
 
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-# Datenbank konfiguration
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, '..', 'db', 'tante_emma.sqlite')
-
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_PATH}'
+# MySQL statt SQLite — kommt aus Docker Environment Variable
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+    'DATABASE_URL',
+    'mysql+pymysql://emma:emmapasswort@db/tanteemma'  # Fallback lokal
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = 'tante-emma-dev'
+app.secret_key = os.environ.get('SECRET_KEY', 'tante-emma-dev')
 
 db.init_app(app)
 
-#Blueprint routen
+# Blueprints
 app.register_blueprint(artikel_bp)
 app.register_blueprint(kunden_bp)
 app.register_blueprint(bestellungen_bp)
 app.register_blueprint(lieferungen_bp)
 
-
-# Frontend ENDpunkt
+# Frontend
 @app.route('/')
 def index():
     return send_from_directory('static', 'index.html')
 
 
-# Startup logik
+# Warten bis MySQL bereit ist
+def wait_for_db():
+    print('Warte auf MySQL...')
+    retries = 15
+    while retries:
+        try:
+            # Verbindungsparameter aus DATABASE_URL lesen
+            url = app.config['SQLALCHEMY_DATABASE_URI']
+            # Direkt mit pymysql testen
+            conn = pymysql.connect(
+                host='db',
+                user=os.environ.get('MYSQL_USER', 'emma'),
+                password=os.environ.get('MYSQL_PASSWORD', 'emmapasswort'),
+                database=os.environ.get('MYSQL_DATABASE', 'tanteemma')
+            )
+            conn.close()
+            print('MySQL ist bereit!')
+            return
+        except Exception as e:
+            print(f'MySQL noch nicht bereit, warte... ({retries} Versuche übrig)')
+            retries -= 1
+            time.sleep(3)
+    print('MySQL nicht erreichbar nach mehreren Versuchen!')
+
+
+# Startup
+with app.app_context():
+    wait_for_db()
+    db.create_all()
+    print('Tabellen erstellt!')
+
+    if Lieferant.query.count() == 0:
+        from seed import seed_daten
+        seed_daten()
+        print('Testdaten eingefügt!')
+
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        print('Tabellen erstellt!')
-
-        # Seed data only if empty
-        if Lieferant.query.count() == 0:
-            from seed import seed_daten
-            seed_daten()
-            print('Testdaten eingefügt!')
-
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)
