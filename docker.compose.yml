@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    container_name: tante-emma-web
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tanteemma.rule=Host(`${TANTE_EMMA_DOMAIN}`)"
+      - "traefik.http.routers.tanteemma.entrypoints=web,websecure"
+      - "traefik.http.routers.tanteemma.tls=true"
+      - "traefik.http.routers.tanteemma.tls.certresolver=production"
+      - "traefik.http.services.tanteemma.loadbalancer.server.port=5000"
+    networks:
+      - backend
+      - traefik_default
+
+  db:
+    image: mysql:8.0
+    container_name: tante-emma-db
+    restart: always
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - backend
+
+volumes:
+  db_data: {}
+
+networks:
+  backend:
+  traefik_default:
+    external: true
