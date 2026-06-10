@@ -1,15 +1,41 @@
+/* =========================
+   GLOBAL BASE
+   ========================= */
+
 body {
     margin: 0;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     background: #0f172a;
     color: white;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-header {
-    text-align: center;
-    padding: 25px;
-    background: linear-gradient(135deg, #22c55e, #16a34a);
+/* =========================
+   BUTTONS (enhanced)
+   ========================= */
+
+button {
+    transition: all 0.2s ease-in-out;
 }
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+/* =========================
+   HEADER
+   ========================= */
+
+header {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* =========================
+   NAV (falls genutzt)
+   ========================= */
 
 nav {
     display: flex;
@@ -19,32 +45,112 @@ nav {
     background: #111827;
 }
 
-button {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 8px;
+/* =========================
+   CARDS / ARTIKEL
+   ========================= */
+
+#artikel-grid > div {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#artikel-grid > div:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* =========================
+   WARENKORB SIDEBAR
+   ========================= */
+
+#warenkorb-panel {
+    backdrop-filter: blur(12px);
+}
+
+/* Slide animation */
+#warenkorb-panel.flex {
+    animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* =========================
+   MODALS (BESTELLUNG + EDIT)
+   ========================= */
+
+#erfolg-modal,
+#edit-modal {
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Modal Box animation */
+#erfolg-modal > div,
+#edit-modal > div {
+    animation: pop 0.2s ease forwards;
+    transform: scale(0.95);
+}
+
+@keyframes pop {
+    to {
+        transform: scale(1);
+    }
+}
+
+/* =========================
+   INPUT FIELDS
+   ========================= */
+
+input {
+    transition: all 0.2s ease;
+}
+
+input:focus {
+    transform: scale(1.01);
+    outline: none;
+}
+
+/* =========================
+   WARENKORB ITEMS
+   ========================= */
+
+#warenkorb-liste > div {
+    transition: background 0.2s ease;
+}
+
+#warenkorb-liste > div:hover {
+    background: #2a3649;
+}
+
+/* =========================
+   SCROLLBAR (dark theme)
+   ========================= */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
     background: #1f2937;
-    color: white;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #22c55e;
-}
-
-main {
-    padding: 20px;
-}
-
-.card {
-    background: #1f2937;
-    padding: 20px;
     border-radius: 10px;
 }
 
-pre {
-    background: #0b1220;
-    padding: 15px;
-    border-radius: 8px;
-    overflow-x: auto;
+::-webkit-scrollbar-thumb:hover {
+    background: #22c55e;
 }
