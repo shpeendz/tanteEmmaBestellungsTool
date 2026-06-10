@@ -21,7 +21,7 @@ services:
       - traefik_default
 
   db:
-    image: mysql:8.0
+    image: mariadb:11
     container_name: tante-emma-db
     restart: always
     volumes:
