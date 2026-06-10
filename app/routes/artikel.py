@@ -18,6 +18,19 @@ def create_artikel_from_json(data):
     )
 
 
+# ← NEU: Alle Artikel abrufen
+@artikel_bp.route('/api/artikel', methods=['GET'])
+def get_artikel():
+    artikel = Artikel.query.all()
+    return jsonify([{
+        'id':          a.ArtikelID,
+        'bezeichnung': a.Bezeichnung,
+        'preis':       float(a.Preis),
+        'bestand':     a.Bestand,
+        'kategorie':   a.Kategorie
+    } for a in artikel])
+
+
 @artikel_bp.route('/api/artikel', methods=['POST'])
 def create_artikel():
     data = request.get_json()

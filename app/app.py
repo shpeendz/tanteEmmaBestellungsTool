@@ -39,7 +39,7 @@ def index():
 # Warten bis MySQL bereit ist
 def wait_for_db():
     print('Warte auf MySQL...')
-    retries = 15
+    retries = 30
     while retries:
         try:
             # Verbindungsparameter aus DATABASE_URL lesen
@@ -57,7 +57,7 @@ def wait_for_db():
         except Exception as e:
             print(f'MySQL noch nicht bereit, warte... ({retries} Versuche übrig)')
             retries -= 1
-            time.sleep(3)
+            time.sleep(5)
     print('MySQL nicht erreichbar nach mehreren Versuchen!')
 
 

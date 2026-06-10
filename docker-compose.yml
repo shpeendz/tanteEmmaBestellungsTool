@@ -6,7 +6,8 @@ services:
     container_name: tante-emma-web
     restart: always
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       DATABASE_URL: ${DATABASE_URL}
     labels:
