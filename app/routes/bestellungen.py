@@ -1,13 +1,23 @@
 import sys
 import os
-from tokenize import String
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from flask import Blueprint, jsonify
 
+from flask import Blueprint, jsonify, request
 from models import Bestellung
 
 bestellungen_bp = Blueprint("bestellungen", __name__)
+
+
+def create_bestellung_from_json(data):
+    return Bestellung(
+        BestellungID=data["ID"],
+        KundeID=data["Kunde"],
+        Datum=data.get("Datum"),
+        Status=data.get("Status"),
+        Wunschtermin=data.get("Wunschtermin")
+    )
+
 
 @bestellungen_bp.route("/api/bestellungen", methods=["GET"])
 def get_bestellungen():
@@ -21,18 +31,19 @@ def get_bestellungen():
         }
         for b in bestellungen
     ])
-#
+
+
 @bestellungen_bp.route("/api/bestellungen", methods=["POST"])
 def create_bestellungen():
+    data = request.get_json()
 
-    # Schritt 1 – JSON aus dem Request lesen
-    daten = request.get_json()
+    neue_bestellung = create_bestellung_from_json(data)
 
-    # Schritt 2 – neues Objekt erstellen
-    neue_bestellung = Bestellung(
-        ID = daten['ID'],
-        Kunde       = daten['Kunde'],
-        Datum     = daten.get('Datum', 0),
-        Status   = daten.get('Status'),
-        Wunschtermin = daten.get('Wunschtermin')
-    )
+    # Save to database
+    db.session.add(neue_bestellung)
+    db.session.commit()
+
+    return jsonify({
+        "message": "Bestellung erstellt",
+        "id": neue_bestellung.BestellungID
+    }), 201
