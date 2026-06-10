@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tante Emma System</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<header>
+    <h1>🛒 Tante Emma Shop</h1>
+    <p>Bestellsystem – Flask API</p>
+</header>
+
+<nav>
+    <button onclick="loadArtikel()">🛒 Artikel</button>
+    <button onclick="loadKunden()">👤 Kunden</button>
+    <button onclick="loadBestellungen()">📦 Bestellungen</button>
+    <button onclick="loadLieferungen()">🚚 Lieferungen</button>
+</nav>
+
+<main>
+    <section class="card">
+        <h2 id="bereich-titel">Willkommen</h2>
+        <div id="output">Klicke oben auf einen Button...</div>
+    </section>
+</main>
+
+<footer>
+    <p>Flask + SQLite + REST API</p>
+</footer>
+
+<script>
+const output = document.getElementById("output");
+const titel  = document.getElementById("bereich-titel");
+
+/* ---------------------------
+   ARTIKEL
+---------------------------- */
+async function loadArtikel() {
+    titel.textContent = "🛒 Artikel";
+    const res  = await fetch("/api/artikel");
+    const data = await res.json();
+
+    output.innerHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Bezeichnung</th>
+                    <th>Preis</th>
+                    <th>Bestand</th>
+                    <th>Kategorie</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${data.map(a => `
+                <tr>
+                    <td>${a.id}</td>
+                    <td>${a.bezeichnung}</td>
+                    <td>${a.preis.toFixed(2)} €</td>
+                    <td>${a.bestand}</td>
+                    <td>${a.kategorie ?? '–'}</td>
+                </tr>`).join('')}
+            </tbody>
+        </table>`;
+}
+
+/* ---------------------------
+   KUNDEN
+---------------------------- */
+async function loadKunden() {
+    titel.textContent = "👤 Kunden";
+    const res  = await fetch("/api/kunden");
+    const data = await res.json();
+
+    output.innerHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Vorname</th>
+                    <th>Nachname</th>
+                    <th>Email</th>
+                    <th>Telefon</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${data.map(k => `
+                <tr>
+                    <td>${k.id}</td>
+                    <td>${k.vorname}</td>
+                    <td>${k.nachname}</td>
+                    <td>${k.email}</td>
+                    <td>${k.telefon ?? '–'}</td>
+                </tr>`).join('')}
+            </tbody>
+        </table>`;
+}
+
+/* ---------------------------
+   BESTELLUNGEN
+---------------------------- */
+async function loadBestellungen() {
+    titel.textContent = "📦 Bestellungen";
+    const res  = await fetch("/api/bestellungen");
+    const data = await res.json();
+
+    output.innerHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Kunde</th>
+                    <th>Datum</th>
+                    <th>Status</th>
+                    <th>Wunschtermin</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${data.map(b => `
+                <tr>
+                    <td>${b.id}</td>
+                    <td>${b.kunde_id}</td>
+                    <td>${b.bestelldatum}</td>
+                    <td><span class="status ${b.status}">${b.status}</span></td>
+                    <td>${b.wunschtermin ?? '–'}</td>
+                </tr>`).join('')}
+            </tbody>
+        </table>`;
+}
+
+/* ---------------------------
+   LIEFERUNGEN
+---------------------------- */
+async function loadLieferungen() {
+    titel.textContent = "🚚 Lieferungen";
+    const res  = await fetch("/api/lieferungen");
+    const data = await res.json();
+
+    output.innerHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Bestellung</th>
+                    <th>Mitarbeiter</th>
+                    <th>Lieferdatum</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${data.map(l => `
+                <tr>
+                    <td>${l.id}</td>
+                    <td>${l.bestellung_id}</td>
+                    <td>${l.mitarbeiter_id ?? '–'}</td>
+                    <td>${l.lieferdatum ?? '–'}</td>
+                    <td><span class="status ${l.status}">${l.status}</span></td>
+                </tr>`).join('')}
+            </tbody>
+        </table>`;
+}
+</script>
+
+</body>
+</html>
