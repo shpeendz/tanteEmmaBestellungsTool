@@ -22,18 +22,17 @@
             <nav class="shop-links" aria-label="Hauptnavigation">
                 <a href="#sortiment">Sortiment</a>
                 <a href="#kategorien">Kategorien</a>
-                <a href="#vorteile">Vorteile</a>
+                <a href="#warenkorb">Warenkorb</a>
             </nav>
 
             <div class="shop-actions">
-                <button class="icon-cart" type="button" aria-label="Warenkorb öffnen">
+                <button id="cart-toggle" class="icon-cart" type="button" aria-label="Warenkorb anzeigen">
                     <span>🛒</span>
                     <span>Warenkorb</span>
+                    <span id="cart-count" class="cart-badge">0</span>
                 </button>
 
-                <a href="/admin/login" class="btn btn-secondary">
-                    Admin Login
-                </a>
+                <a href="/admin/login" class="btn btn-secondary">Admin Login</a>
             </div>
         </div>
     </header>
@@ -57,7 +56,7 @@
                     <div class="shop-search-wrap">
                         <label for="shop-search" class="sr-label">Produkte durchsuchen</label>
                         <input id="shop-search" type="text" placeholder="z. B. Äpfel, Milch, Brot" />
-                        <button type="button" class="btn btn-primary search-btn">Suchen</button>
+                        <button id="search-btn" type="button" class="btn btn-primary search-btn">Suchen</button>
                     </div>
                 </div>
 
@@ -104,12 +103,12 @@
                 </div>
 
                 <div class="category-grid">
-                    <button class="category-card" type="button">🍎 Obst</button>
-                    <button class="category-card" type="button">🥦 Gemüse</button>
-                    <button class="category-card" type="button">🥛 Milchprodukte</button>
-                    <button class="category-card" type="button">🍞 Backwaren</button>
-                    <button class="category-card" type="button">🌿 Bio</button>
-                    <button class="category-card" type="button">🥩 Fleisch</button>
+                    <button class="category-card" type="button" data-category="Alle">✨ Alle</button>
+                    <button class="category-card" type="button" data-category="Obst">🍎 Obst</button>
+                    <button class="category-card" type="button" data-category="Gemüse">🥦 Gemüse</button>
+                    <button class="category-card" type="button" data-category="Milch">🥛 Milch</button>
+                    <button class="category-card" type="button" data-category="Backwaren">🍞 Backwaren</button>
+                    <button class="category-card" type="button" data-category="Bio">🌿 Bio</button>
                 </div>
             </div>
         </section>
@@ -119,94 +118,46 @@
                 <div class="section-header section-row">
                     <div>
                         <p class="eyebrow accent">Sortiment</p>
-                        <h3>Empfohlene Produkte</h3>
+                        <h3>Produkte aus deiner Datenbank</h3>
                     </div>
 
                     <a href="/admin/login" class="text-link">Adminzugang öffnen</a>
                 </div>
 
-                <div class="product-grid">
-                    <article class="product-card">
-                        <div class="product-media">🍎</div>
-                        <div class="product-body">
-                            <span class="product-tag">Obst</span>
-                            <h4>Rote Äpfel</h4>
-                            <p>Knackig, frisch und ideal für den Alltag.</p>
-                        </div>
-                        <div class="product-footer">
-                            <strong>2,49 €</strong>
-                            <button class="btn btn-primary small-btn" type="button">In den Warenkorb</button>
-                        </div>
-                    </article>
-
-                    <article class="product-card">
-                        <div class="product-media">🥛</div>
-                        <div class="product-body">
-                            <span class="product-tag">Milch</span>
-                            <h4>Bio Vollmilch</h4>
-                            <p>Regional produziert und täglich verfügbar.</p>
-                        </div>
-                        <div class="product-footer">
-                            <strong>1,69 €</strong>
-                            <button class="btn btn-primary small-btn" type="button">In den Warenkorb</button>
-                        </div>
-                    </article>
-
-                    <article class="product-card">
-                        <div class="product-media">🍞</div>
-                        <div class="product-body">
-                            <span class="product-tag">Backwaren</span>
-                            <h4>Frisches Landbrot</h4>
-                            <p>Außen knusprig, innen weich und aromatisch.</p>
-                        </div>
-                        <div class="product-footer">
-                            <strong>3,19 €</strong>
-                            <button class="btn btn-primary small-btn" type="button">In den Warenkorb</button>
-                        </div>
-                    </article>
-
-                    <article class="product-card">
-                        <div class="product-media">🥦</div>
-                        <div class="product-body">
-                            <span class="product-tag">Gemüse</span>
-                            <h4>Brokkoli</h4>
-                            <p>Frisch, grün und perfekt für schnelle Gerichte.</p>
-                        </div>
-                        <div class="product-footer">
-                            <strong>2,29 €</strong>
-                            <button class="btn btn-primary small-btn" type="button">In den Warenkorb</button>
-                        </div>
-                    </article>
-                </div>
+                <div id="shop-feedback" class="shop-feedback"></div>
+                <div id="product-grid" class="product-grid"></div>
             </div>
         </section>
 
-        <section id="vorteile" class="shop-benefits">
+        <section id="warenkorb" class="cart-section">
             <div class="container">
                 <div class="section-header">
-                    <p class="eyebrow accent">Warum dieser Shop</p>
-                    <h3>Einfach für Kunden, praktisch für Admins</h3>
+                    <p class="eyebrow accent">Warenkorb</p>
+                    <h3>Deine Auswahl</h3>
                 </div>
 
-                <div class="benefit-grid">
-                    <article class="benefit-card">
-                        <h4>Schnelle Bestellung</h4>
-                        <p>Klare Produktansicht, direkte Aktionen und kurze Wege zum Warenkorb.</p>
-                    </article>
+                <div class="cart-box">
+                    <div id="cart-items" class="cart-items"></div>
 
-                    <article class="benefit-card">
-                        <h4>Volle Übersicht</h4>
-                        <p>Der Adminbereich zeigt Bestellungen, Kunden, Artikel und Lieferungen zentral an.</p>
-                    </article>
+                    <div class="cart-summary">
+                        <div class="cart-summary-row">
+                            <span>Artikel gesamt</span>
+                            <strong id="cart-count-summary">0</strong>
+                        </div>
+                        <div class="cart-summary-row total-row">
+                            <span>Gesamt</span>
+                            <strong id="cart-total">0,00 €</strong>
+                        </div>
 
-                    <article class="benefit-card">
-                        <h4>Saubere Struktur</h4>
-                        <p>Flask, SQLAlchemy und getrennte Bereiche für Shop, API und Adminzugang.</p>
-                    </article>
+                        <button id="checkout-btn" type="button" class="btn btn-primary btn-full">
+                            Bestellung abschicken
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
+
+    <script src="/static/shop.js"></script>
 </body>
 </html>
-<script src="/static/shop.js"></script>
