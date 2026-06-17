@@ -11,37 +11,46 @@ artikel_bp = Blueprint('artikel', __name__)
 
 def create_artikel_from_json(data):
     return Artikel(
-        Bezeichnung=data["bezeichnung"],
-        Preis=data["preis"],
-        Bestand=data.get("bestand", 0),
+        Bezeichnung=data["bezeichnung"].strip(),
+        Preis=float(data["preis"]),
+        Bestand=int(data.get("bestand", 0)),
         Kategorie=data.get("kategorie")
     )
 
 
-# ← NEU: Alle Artikel abrufen
 @artikel_bp.route('/api/artikel', methods=['GET'])
 def get_artikel():
     artikel = Artikel.query.all()
     return jsonify([{
-        'id':          a.ArtikelID,
+        'id': a.ArtikelID,
         'bezeichnung': a.Bezeichnung,
-        'preis':       float(a.Preis),
-        'bestand':     a.Bestand,
-        'kategorie':   a.Kategorie
+        'preis': float(a.Preis),
+        'bestand': a.Bestand,
+        'kategorie': a.Kategorie
     } for a in artikel])
 
 
 @artikel_bp.route('/api/artikel', methods=['POST'])
 def create_artikel():
-    data = request.get_json()
+    if not request.is_json:
+        return jsonify({"error": "Content-Type muss application/json sein"}), 400
 
-    if not data:
-        return jsonify({"error": "No JSON provided"}), 400
+    data = request.get_json(silent=True)
+    if data is None:
+        return jsonify({"error": "Ungültiges JSON"}), 400
 
-    artikel = create_artikel_from_json(data)
+    if "bezeichnung" not in data or "preis" not in data:
+        return jsonify({"error": "Pflichtfelder: bezeichnung, preis"}), 400
 
-    db.session.add(artikel)
-    db.session.commit()
+    if not str(data["bezeichnung"]).strip():
+        return jsonify({"error": "Bezeichnung darf nicht leer sein"}), 400
+
+    try:
+        artikel = create_artikel_from_json(data)
+        db.session.add(artikel)
+        db.session.commit()
+    except ValueError:
+        return jsonify({"error": "preis oder bestand hat ein ungültiges Format"}), 400
 
     return jsonify({
         "id": artikel.ArtikelID,
