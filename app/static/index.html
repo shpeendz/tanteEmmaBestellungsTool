@@ -1,459 +1,647 @@
 <!DOCTYPE html>
 <html lang="de" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tante Emma Shop</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { darkMode: 'class' }
-    </script>
-
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tante Emma Shop</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            accent: {
+              50: "#ecfeff",
+              100: "#cffafe",
+              200: "#a5f3fc",
+              300: "#67e8f9",
+              400: "#22d3ee",
+              500: "#14b8a6",
+              600: "#0f766e",
+              700: "#115e59",
+              800: "#134e4a",
+              900: "#042f2e"
+            }
+          },
+          boxShadow: {
+            soft: "0 10px 30px rgba(0,0,0,0.25)"
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="/static/style.css" />
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col">
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 bg-accent-500 text-black px-3 py-2 rounded-md">
+    Zum Inhalt springen
+  </a>
 
-<header class="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
-    <div class="flex items-center gap-3">
-        <div class="bg-teal-500 rounded-lg w-8 h-8 flex items-center justify-center text-black font-bold text-sm">T</div>
-        <h1 class="text-lg font-semibold">Tante Emma Shop</h1>
-    </div>
-
-    <button id="warenkorb-toggle"
-        class="relative flex items-center gap-2 bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg text-sm transition">
-        🛒 Warenkorb
-        <span id="warenkorb-anzahl"
-            class="bg-teal-500 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-            0
-        </span>
-    </button>
-</header>
-
-<div class="flex flex-1">
-    <main class="flex-1 p-6">
-        <h2 class="text-xl font-semibold mb-6">Unser Sortiment</h2>
-        <div id="artikel-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <p class="text-gray-500 text-sm">Lädt Artikel...</p>
-        </div>
-    </main>
-
-    <aside id="warenkorb-panel"
-        class="hidden w-80 bg-gray-900 border-l border-gray-800 p-5 flex-col">
-        <h2 class="text-base font-semibold mb-4">🛒 Warenkorb</h2>
-
-        <div id="warenkorb-liste" class="flex-1 flex flex-col gap-2 overflow-y-auto">
-            <p class="text-sm text-gray-500">Noch keine Artikel im Warenkorb.</p>
+  <div class="min-h-screen flex flex-col">
+    <header class="sticky top-0 z-30 border-b border-slate-800/80 bg-slate-950/85 backdrop-blur">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-accent-500 text-black flex items-center justify-center font-black shadow-soft">
+            T
+          </div>
+          <div>
+            <p class="text-sm text-slate-400">Schulprojekt</p>
+            <h1 class="text-lg sm:text-xl font-semibold tracking-tight">Tante Emma Shop</h1>
+          </div>
         </div>
 
-        <div class="border-t border-gray-800 pt-4 mt-4">
-            <div class="flex justify-between text-sm mb-4">
-                <span class="text-gray-400">Gesamt</span>
-                <span class="font-bold text-teal-400" id="warenkorb-gesamt">0.00 €</span>
+        <div class="flex items-center gap-2 sm:gap-3">
+          <button id="theme-toggle" class="h-11 w-11 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 focus:outline-none focus:ring-2 focus:ring-accent-400" aria-label="Theme wechseln">
+            <span id="theme-icon">🌙</span>
+          </button>
+
+          <button id="cart-toggle" class="relative inline-flex items-center gap-2 rounded-xl bg-accent-500 hover:bg-accent-400 text-black px-4 py-2.5 font-semibold shadow-soft focus:outline-none focus:ring-2 focus:ring-accent-300">
+            <span>Warenkorb</span>
+            <span id="cart-count" class="min-w-6 h-6 px-1 rounded-full bg-black/15 text-sm flex items-center justify-center">0</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" class="flex-1">
+      <section class="border-b border-slate-900 bg-gradient-to-b from-slate-900 to-slate-950">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+          <div class="grid lg:grid-cols-[1.2fr_0.8fr] gap-6 items-center">
+            <div>
+              <p class="text-accent-400 text-sm font-medium mb-3">Modernes Frontend auf deiner Flask-API</p>
+              <h2 class="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+                Übersichtlicher Shop mit Suche, Kategorien und funktionierendem Warenkorb
+              </h2>
+              <p class="text-slate-400 max-w-2xl">
+                Produkte laden aus deiner API, lassen sich bearbeiten, in den Warenkorb legen und als Bestellung abschicken.
+              </p>
             </div>
 
-            <input id="kunde-name" type="text" placeholder="Dein Vor- und Nachname"
-                class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm w-full mb-2">
-
-            <input id="kunde-email" type="email" placeholder="Deine E-Mail"
-                class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm w-full mb-3">
-
-            <button id="bestellung-button"
-                class="w-full bg-teal-500 hover:bg-teal-400 text-black font-semibold py-2 rounded-lg text-sm">
-                Bestellung aufgeben
-            </button>
-
-            <button id="warenkorb-leeren"
-                class="w-full mt-2 text-gray-500 hover:text-gray-300 text-xs">
-                Warenkorb leeren
-            </button>
+            <div class="grid sm:grid-cols-3 gap-3">
+              <div class="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                <p class="text-slate-400 text-sm">Artikel</p>
+                <p id="metric-artikel" class="text-2xl font-bold mt-1">0</p>
+              </div>
+              <div class="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                <p class="text-slate-400 text-sm">Im Warenkorb</p>
+                <p id="metric-cart" class="text-2xl font-bold mt-1">0</p>
+              </div>
+              <div class="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                <p class="text-slate-400 text-sm">Wert</p>
+                <p id="metric-total" class="text-2xl font-bold mt-1">0.00 €</p>
+              </div>
+            </div>
+          </div>
         </div>
-    </aside>
-</div>
+      </section>
 
-<div id="erfolg-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-8 max-w-sm w-full text-center">
-        <div class="text-5xl mb-4">🎉</div>
-        <h3 class="text-xl font-bold mb-2">Bestellung aufgegeben!</h3>
-        <p class="text-gray-400 text-sm mb-6">Deine Bestellung wurde erfolgreich gespeichert.</p>
-        <button id="modal-close"
-            class="bg-teal-500 hover:bg-teal-400 text-black font-semibold px-6 py-2 rounded-lg text-sm">
-            Weiter einkaufen
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        <div class="grid gap-4 lg:grid-cols-[260px_1fr]">
+          <aside class="rounded-2xl border border-slate-800 bg-slate-900 p-4 h-fit">
+            <h3 class="font-semibold mb-4">Filter</h3>
+
+            <label for="search" class="block text-sm text-slate-300 mb-2">Suche</label>
+            <input id="search" type="text" placeholder="Artikel suchen..."
+              class="w-full rounded-xl bg-slate-950 border border-slate-800 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-400 mb-4" />
+
+            <p class="text-sm text-slate-300 mb-2">Kategorie</p>
+            <div id="category-list" class="flex flex-wrap gap-2"></div>
+
+            <hr class="my-4 border-slate-800" />
+
+            <button id="reset-filters" class="w-full rounded-xl bg-slate-800 hover:bg-slate-700 px-4 py-2.5 text-sm font-medium">
+              Filter zurücksetzen
+            </button>
+          </aside>
+
+          <section>
+            <div class="flex items-center justify-between gap-4 mb-4">
+              <div>
+                <h3 class="text-xl font-semibold">Sortiment</h3>
+                <p id="result-count" class="text-sm text-slate-400">Lädt Artikel...</p>
+              </div>
+            </div>
+
+            <div id="article-grid" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- CART DRAWER -->
+  <aside id="cart-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-slate-950 border-l border-slate-800 shadow-soft transform translate-x-full transition-transform duration-300 z-40 flex flex-col" aria-hidden="true">
+    <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+      <div>
+        <h3 class="text-lg font-semibold">Warenkorb</h3>
+        <p class="text-sm text-slate-400">Deine Auswahl</p>
+      </div>
+      <button id="cart-close" class="h-10 w-10 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800" aria-label="Warenkorb schließen">✕</button>
+    </div>
+
+    <div id="cart-items" class="flex-1 overflow-y-auto p-5 space-y-3"></div>
+
+    <div class="border-t border-slate-800 p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <span class="text-slate-400">Gesamt</span>
+        <span id="cart-total" class="text-xl font-bold text-accent-400">0.00 €</span>
+      </div>
+
+      <div class="grid gap-3">
+        <div>
+          <label for="customer-name" class="block text-sm text-slate-300 mb-1">Name</label>
+          <input id="customer-name" type="text" autocomplete="name"
+            class="w-full rounded-xl bg-slate-900 border border-slate-800 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-accent-400" />
+        </div>
+        <div>
+          <label for="customer-email" class="block text-sm text-slate-300 mb-1">E-Mail</label>
+          <input id="customer-email" type="email" autocomplete="email"
+            class="w-full rounded-xl bg-slate-900 border border-slate-800 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-accent-400" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <button id="clear-cart" class="rounded-xl bg-slate-800 hover:bg-slate-700 px-4 py-3 font-medium">
+          Leeren
         </button>
+        <button id="submit-order" class="rounded-xl bg-accent-500 hover:bg-accent-400 text-black px-4 py-3 font-semibold">
+          Bestellen
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-500">
+        Hinweis: Für wiederholte Bestellungen mit gleicher E-Mail solltest du deinen Kunden-Endpoint noch auf “vorhandenen Kunden wiederverwenden” erweitern. [page:2]
+      </p>
     </div>
-</div>
+  </aside>
 
-<div id="edit-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 max-w-md w-full">
-        <h3 class="text-lg font-bold mb-4">Artikel bearbeiten</h3>
+  <div id="drawer-overlay" class="fixed inset-0 bg-black/50 opacity-0 pointer-events-none transition-opacity duration-300 z-30"></div>
 
-        <input id="edit-name" class="w-full mb-2 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm"
-               placeholder="Bezeichnung">
-
-        <input id="edit-preis" type="number" step="0.01"
-               class="w-full mb-2 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm"
-               placeholder="Preis">
-
-        <input id="edit-bestand" type="number"
-               class="w-full mb-2 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm"
-               placeholder="Bestand">
-
-        <input id="edit-kategorie"
-               class="w-full mb-4 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm"
-               placeholder="Kategorie">
-
-        <div class="flex gap-2">
-            <button id="edit-save"
-                class="flex-1 bg-teal-500 hover:bg-teal-400 text-black font-semibold py-2 rounded">
-                Speichern
-            </button>
-
-            <button id="edit-cancel"
-                class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 py-2 rounded">
-                Abbrechen
-            </button>
+  <!-- EDIT MODAL -->
+  <div id="edit-modal" class="fixed inset-0 hidden items-center justify-center bg-black/60 z-50 p-4">
+    <div class="w-full max-w-lg rounded-3xl border border-slate-800 bg-slate-950 p-6 shadow-soft">
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <h3 class="text-xl font-semibold">Artikel bearbeiten</h3>
+          <p class="text-sm text-slate-400">Änderungen direkt per API speichern</p>
         </div>
+        <button id="edit-close" class="h-10 w-10 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800" aria-label="Modal schließen">✕</button>
+      </div>
+
+      <div class="grid gap-4">
+        <div>
+          <label for="edit-name" class="block text-sm text-slate-300 mb-1">Bezeichnung</label>
+          <input id="edit-name" type="text" class="w-full rounded-xl bg-slate-900 border border-slate-800 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-accent-400">
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label for="edit-price" class="block text-sm text-slate-300 mb-1">Preis</label>
+            <input id="edit-price" type="number" step="0.01" class="w-full rounded-xl bg-slate-900 border border-slate-800 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-accent-400">
+          </div>
+          <div>
+            <label for="edit-stock" class="block text-sm text-slate-300 mb-1">Bestand</label>
+            <input id="edit-stock" type="number" class="w-full rounded-xl bg-slate-900 border border-slate-800 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-accent-400">
+          </div>
+        </div>
+
+        <div>
+          <label for="edit-category" class="block text-sm text-slate-300 mb-1">Kategorie</label>
+          <input id="edit-category" type="text" class="w-full rounded-xl bg-slate-900 border border-slate-800 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-accent-400">
+        </div>
+      </div>
+
+      <div class="mt-6 flex gap-3">
+        <button id="edit-save" class="flex-1 rounded-xl bg-accent-500 hover:bg-accent-400 text-black px-4 py-3 font-semibold">Speichern</button>
+        <button id="edit-cancel" class="flex-1 rounded-xl bg-slate-800 hover:bg-slate-700 px-4 py-3 font-medium">Abbrechen</button>
+      </div>
     </div>
-</div>
+  </div>
 
-<script>
-// *************** WARENKORB ***************
-let warenkorb = [];
-let editArtikelId = null;
+  <!-- TOAST -->
+  <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 hidden px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 shadow-soft z-50 text-sm"></div>
 
-// DOM Elemente
-const artikelGrid = document.getElementById("artikel-grid");
-const warenkorbPanel = document.getElementById("warenkorb-panel");
-const warenkorbListe = document.getElementById("warenkorb-liste");
-const warenkorbAnzahl = document.getElementById("warenkorb-anzahl");
-const warenkorbGesamt = document.getElementById("warenkorb-gesamt");
-const erfolgModal = document.getElementById("erfolg-modal");
-const editModal = document.getElementById("edit-modal");
+  <script>
+    let allArticles = [];
+    let cart = [];
+    let selectedCategory = "Alle";
+    let currentEditId = null;
 
-// Event Listeners
-document.getElementById("warenkorb-toggle").addEventListener("click", toggleWarenkorb);
-document.getElementById("warenkorb-leeren").addEventListener("click", warenkorbLeeren);
-document.getElementById("bestellung-button").addEventListener("click", bestellungAufgeben);
-document.getElementById("modal-close").addEventListener("click", () => erfolgModal.classList.add("hidden"));
-document.getElementById("edit-cancel").addEventListener("click", () => editModal.classList.add("hidden"));
-document.getElementById("edit-save").addEventListener("click", saveArtikelUpdate);
+    const articleGrid = document.getElementById("article-grid");
+    const categoryList = document.getElementById("category-list");
+    const searchInput = document.getElementById("search");
+    const resultCount = document.getElementById("result-count");
+    const metricArtikel = document.getElementById("metric-artikel");
+    const metricCart = document.getElementById("metric-cart");
+    const metricTotal = document.getElementById("metric-total");
 
-// Warenkorb öffnen/schließen
-function toggleWarenkorb() {
-    warenkorbPanel.classList.toggle("hidden");
-    warenkorbPanel.classList.toggle("flex");
-}
+    const cartDrawer = document.getElementById("cart-drawer");
+    const drawerOverlay = document.getElementById("drawer-overlay");
+    const cartItems = document.getElementById("cart-items");
+    const cartCount = document.getElementById("cart-count");
+    const cartTotal = document.getElementById("cart-total");
 
-// Kategorie Icon
-function kategorieIcon(kat) {
-    const icons = {
+    const toast = document.getElementById("toast");
+    const editModal = document.getElementById("edit-modal");
+
+    function showToast(message, isError = false) {
+      toast.textContent = message;
+      toast.className = `fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-3 rounded-xl border shadow-soft z-50 text-sm ${isError ? "bg-rose-950 border-rose-800 text-rose-200" : "bg-slate-900 border-slate-700 text-slate-100"}`;
+      toast.classList.remove("hidden");
+      setTimeout(() => toast.classList.add("hidden"), 2400);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function euro(value) {
+      return `${Number(value || 0).toFixed(2)} €`;
+    }
+
+    function iconForCategory(category) {
+      const map = {
         Obst: "🍎",
+        Gemüse: "🥦",
         Milch: "🥛",
         Bio: "🌿",
         Backwaren: "🍞",
-        Gemüse: "🥦",
         Fleisch: "🥩"
-    };
-    return icons[kat] || "📦";
-}
-
-// HTML escaping (verhindert Fehler bei Apostrophen)
-function escapeHtml(text) {
-    const map = {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;"
-    };
-    return String(text).replace(/[&<>"']/g, m => map[m]);
-}
-
-// Artikel laden
-async function ladeArtikel() {
-    console.log("Artikel werden geladen...");
-    artikelGrid.innerHTML = '<p class="text-gray-500 text-sm">Lädt Artikel...</p>';
-
-    try {
-        const response = await fetch("/api/artikel");
-        console.log("Response Status:", response.status);
-
-        if (!response.ok) {
-            console.error("HTTP Error:", response.status);
-            throw new Error("Artikel konnten nicht geladen werden");
-        }
-
-        const artikel = await response.json();
-        console.log("Artikel geladen:", artikel);
-
-        if (artikel.length === 0) {
-            artikelGrid.innerHTML = '<p class="text-gray-500 text-sm">Keine Artikel gefunden.</p>';
-            return;
-        }
-
-        // HTML rendern
-        artikelGrid.innerHTML = artikel.map(a => `
-            <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col gap-3">
-                <div class="text-4xl">${kategorieIcon(a.kategorie)}</div>
-                <h3 class="font-medium text-sm">${escapeHtml(a.bezeichnung)}</h3>
-                <p class="text-xs text-gray-500">${escapeHtml(a.kategorie || "–")}</p>
-                <div class="flex justify-between text-sm">
-                    <span class="text-teal-400 font-bold">${a.preis.toFixed(2)} €</span>
-                    <span class="text-xs text-gray-600">Bestand: ${a.bestand}</span>
-                </div>
-                <div class="flex gap-2">
-                    ${a.bestand > 0
-                        ? `<button class="flex-1 bg-gray-800 hover:bg-teal-900 text-sm py-1.5 rounded"
-                            data-id="${a.id}"
-                            data-bezeichnung="${escapeHtml(a.bezeichnung)}"
-                            data-preis="${a.preis}">
-                            + Warenkorb
-                          </button>`
-                        : `<button disabled class="flex-1 bg-gray-800 text-gray-600 text-sm py-1.5 rounded">
-                            Ausverkauft
-                          </button>`
-                    }
-                    <button class="px-3 bg-gray-700 hover:bg-gray-600 rounded"
-                        data-id="${a.id}"
-                        data-bezeichnung="${escapeHtml(a.bezeichnung)}"
-                        data-preis="${a.preis}"
-                        data-bestand="${a.bestand}"
-                        data-kategorie="${escapeHtml(a.kategorie || "")}">
-                        ✏️
-                    </button>
-                </div>
-            </div>
-        `).join("");
-
-        // Event Listeners für Buttons
-        // "Warenkorb" Buttons
-        artikelGrid.querySelectorAll("[data-id]").forEach(btn => {
-            if (btn.textContent.includes("+ Warenkorb")) {
-                btn.addEventListener("click", () => {
-                    const artikel = {
-                        id: parseInt(btn.dataset.id),
-                        bezeichnung: btn.dataset.bezeichnung,
-                        preis: parseFloat(btn.dataset.preis)
-                    };
-                    inWarenkorb(artikel);
-                });
-            }
-            // "Edit" Buttons
-            if (btn.textContent.includes("✏️")) {
-                btn.addEventListener("click", () => {
-                    const artikel = {
-                        id: parseInt(btn.dataset.id),
-                        bezeichnung: btn.dataset.bezeichnung,
-                        preis: parseFloat(btn.dataset.preis),
-                        bestand: parseInt(btn.dataset.bestand),
-                        kategorie: btn.dataset.kategorie
-                    };
-                    openEditModal(artikel);
-                });
-            }
-        });
-
-    } catch (error) {
-        console.error("Fehler beim Laden:", error);
-        artikelGrid.innerHTML = '<p class="text-red-400 text-sm">Fehler beim Laden der Artikel.</p>';
-    }
-}
-
-// Ware in Warenkorb
-function inWarenkorb(artikel) {
-    console.log("In Warenkorb:", artikel);
-
-    const existierend = warenkorb.find(a => a.id === artikel.id);
-
-    if (existierend) {
-        existierend.menge++;
-    } else {
-        warenkorb.push({
-            id: artikel.id,
-            bezeichnung: artikel.bezeichnung,
-            preis: artikel.preis,
-            menge: 1
-        });
+      };
+      return map[category] || "📦";
     }
 
-    renderWarenkorb();
-    console.log("Warenkorb jetzt:", warenkorb);
-}
+    async function api(url, options = {}) {
+      const response = await fetch(url, options);
+      let data = null;
 
-// Warenkorb renderen
-function renderWarenkorb() {
-    console.log("Warenkorb renderen:", warenkorb);
+      try {
+        data = await response.json();
+      } catch (_) {}
 
-    if (warenkorb.length === 0) {
-        warenkorbListe.innerHTML = '<p class="text-sm text-gray-500">Noch keine Artikel.</p>';
-        warenkorbAnzahl.textContent = "0";
-        warenkorbGesamt.textContent = "0.00 €";
+      if (!response.ok) {
+        const message = data?.error || `HTTP ${response.status}`;
+        throw new Error(message);
+      }
+
+      return data;
+    }
+
+    function renderCategories() {
+      const categories = ["Alle", ...new Set(allArticles.map(a => a.kategorie).filter(Boolean))];
+
+      categoryList.innerHTML = categories.map(cat => `
+        <button
+          class="category-btn px-3 py-2 rounded-xl text-sm border ${selectedCategory === cat ? "bg-accent-500 text-black border-accent-400" : "bg-slate-950 border-slate-800 hover:bg-slate-800"}"
+          data-category="${escapeHtml(cat)}">
+          ${escapeHtml(cat)}
+        </button>
+      `).join("");
+
+      categoryList.querySelectorAll(".category-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          selectedCategory = btn.dataset.category;
+          renderCategories();
+          renderArticles();
+        });
+      });
+    }
+
+    function filteredArticles() {
+      const term = searchInput.value.trim().toLowerCase();
+
+      return allArticles.filter(article => {
+        const matchSearch =
+          !term ||
+          article.bezeichnung.toLowerCase().includes(term) ||
+          (article.kategorie || "").toLowerCase().includes(term);
+
+        const matchCategory =
+          selectedCategory === "Alle" || article.kategorie === selectedCategory;
+
+        return matchSearch && matchCategory;
+      });
+    }
+
+    function renderArticles() {
+      const items = filteredArticles();
+
+      resultCount.textContent = `${items.length} Artikel angezeigt`;
+      metricArtikel.textContent = `${allArticles.length}`;
+
+      if (items.length === 0) {
+        articleGrid.innerHTML = `
+          <div class="col-span-full rounded-2xl border border-slate-800 bg-slate-900 p-8 text-center">
+            <p class="text-slate-300 font-medium mb-1">Keine Artikel gefunden</p>
+            <p class="text-sm text-slate-500">Passe Suche oder Kategorie an.</p>
+          </div>
+        `;
         return;
-    }
+      }
 
-    warenkorbListe.innerHTML = warenkorb.map(item => `
-        <div class="bg-gray-800 rounded-lg p-3 flex justify-between items-center">
+      articleGrid.innerHTML = items.map(article => `
+        <article class="rounded-3xl border border-slate-800 bg-slate-900 p-5 flex flex-col gap-4 shadow-soft">
+          <div class="flex items-start justify-between gap-4">
+            <div class="text-4xl">${iconForCategory(article.kategorie)}</div>
+            <span class="text-xs px-2.5 py-1 rounded-full ${article.bestand > 0 ? "bg-emerald-950 text-emerald-300 border border-emerald-800" : "bg-rose-950 text-rose-300 border border-rose-800"}">
+              ${article.bestand > 0 ? `${article.bestand} auf Lager` : "Ausverkauft"}
+            </span>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold leading-tight">${escapeHtml(article.bezeichnung)}</h3>
+            <p class="text-sm text-slate-400 mt-1">${escapeHtml(article.kategorie || "Ohne Kategorie")}</p>
+          </div>
+
+          <div class="flex items-end justify-between">
             <div>
-                <p class="text-sm font-medium">${escapeHtml(item.bezeichnung)}</p>
-                <p class="text-xs text-gray-400">${item.menge} × ${item.preis.toFixed(2)} €</p>
+              <p class="text-sm text-slate-500">Preis</p>
+              <p class="text-2xl font-bold text-accent-400">${euro(article.preis)}</p>
             </div>
-            <div class="flex items-center gap-2">
-                <button class="text-xs px-2 py-1 bg-gray-700 rounded minus-btn" data-id="${item.id}">−</button>
-                <span class="text-sm">${item.menge}</span>
-                <button class="text-xs px-2 py-1 bg-gray-700 rounded plus-btn" data-id="${item.id}">+</button>
+          </div>
+
+          <div class="grid grid-cols-[1fr_auto] gap-3 mt-auto">
+            <button
+              class="add-to-cart rounded-2xl px-4 py-3 font-semibold ${article.bestand > 0 ? "bg-accent-500 hover:bg-accent-400 text-black" : "bg-slate-800 text-slate-500 cursor-not-allowed"}"
+              data-id="${article.id}"
+              ${article.bestand > 0 ? "" : "disabled"}>
+              In den Warenkorb
+            </button>
+
+            <button
+              class="edit-article rounded-2xl px-4 py-3 bg-slate-800 hover:bg-slate-700"
+              data-id="${article.id}"
+              aria-label="Artikel bearbeiten">
+              ✏️
+            </button>
+          </div>
+        </article>
+      `).join("");
+
+      articleGrid.querySelectorAll(".add-to-cart").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const article = allArticles.find(a => a.id === Number(btn.dataset.id));
+          addToCart(article);
+        });
+      });
+
+      articleGrid.querySelectorAll(".edit-article").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const article = allArticles.find(a => a.id === Number(btn.dataset.id));
+          openEditModal(article);
+        });
+      });
+    }
+
+    function addToCart(article) {
+      if (!article) return;
+
+      const existing = cart.find(item => item.id === article.id);
+
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        cart.push({
+          id: article.id,
+          bezeichnung: article.bezeichnung,
+          preis: Number(article.preis),
+          quantity: 1
+        });
+      }
+
+      renderCart();
+      showToast(`${article.bezeichnung} wurde zum Warenkorb hinzugefügt.`);
+    }
+
+    function changeQuantity(id, delta) {
+      const item = cart.find(entry => entry.id === id);
+      if (!item) return;
+
+      item.quantity += delta;
+
+      if (item.quantity <= 0) {
+        cart = cart.filter(entry => entry.id !== id);
+      }
+
+      renderCart();
+    }
+
+    function clearCart() {
+      cart = [];
+      renderCart();
+    }
+
+    function renderCart() {
+      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const total = cart.reduce((sum, item) => sum + item.preis * item.quantity, 0);
+
+      cartCount.textContent = String(count);
+      metricCart.textContent = String(count);
+      cartTotal.textContent = euro(total);
+      metricTotal.textContent = euro(total);
+
+      if (cart.length === 0) {
+        cartItems.innerHTML = `
+          <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5 text-center">
+            <p class="font-medium mb-1">Dein Warenkorb ist leer</p>
+            <p class="text-sm text-slate-500">Lege Artikel aus dem Sortiment hinein.</p>
+          </div>
+        `;
+        return;
+      }
+
+      cartItems.innerHTML = cart.map(item => `
+        <div class="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-medium">${escapeHtml(item.bezeichnung)}</p>
+              <p class="text-sm text-slate-400 mt-1">${euro(item.preis)} pro Stück</p>
             </div>
+            <p class="font-semibold text-accent-400">${euro(item.preis * item.quantity)}</p>
+          </div>
+
+          <div class="mt-4 flex items-center gap-2">
+            <button class="qty-btn h-10 w-10 rounded-xl bg-slate-800 hover:bg-slate-700" data-id="${item.id}" data-delta="-1" aria-label="Menge verringern">−</button>
+            <div class="min-w-12 text-center font-semibold">${item.quantity}</div>
+            <button class="qty-btn h-10 w-10 rounded-xl bg-slate-800 hover:bg-slate-700" data-id="${item.id}" data-delta="1" aria-label="Menge erhöhen">+</button>
+          </div>
         </div>
-    `).join("");
+      `).join("");
 
-    // Gesamt berechnen
-    const count = warenkorb.reduce((sum, item) => sum + item.menge, 0);
-    const total = warenkorb.reduce((sum, item) => sum + item.preis * item.menge, 0);
-
-    warenkorbAnzahl.textContent = count;
-    warenkorbGesamt.textContent = `${total.toFixed(2)} €`;
-
-    // +/- Buttons
-    warenkorbListe.querySelectorAll(".plus-btn").forEach(btn => {
-        btn.addEventListener("click", () => mengeAendern(parseInt(btn.dataset.id), 1));
-    });
-
-    warenkorbListe.querySelectorAll(".minus-btn").forEach(btn => {
-        btn.addEventListener("click", () => mengeAendern(parseInt(btn.dataset.id), -1));
-    });
-}
-
-// Menge ändern
-function mengeAendern(id, delta) {
-    const item = warenkorb.find(a => a.id === id);
-    if (!item) return;
-
-    item.menge += delta;
-
-    if (item.menge <= 0) {
-        warenkorb = warenkorb.filter(a => a.id !== id);
+      cartItems.querySelectorAll(".qty-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          changeQuantity(Number(btn.dataset.id), Number(btn.dataset.delta));
+        });
+      });
     }
 
-    renderWarenkorb();
-}
+    function openCart() {
+      cartDrawer.classList.remove("translate-x-full");
+      drawerOverlay.classList.remove("opacity-0", "pointer-events-none");
+      cartDrawer.setAttribute("aria-hidden", "false");
+    }
 
-// Warenkorb leeren
-function warenkorbLeeren() {
-    warenkorb = [];
-    renderWarenkorb();
-}
+    function closeCart() {
+      cartDrawer.classList.add("translate-x-full");
+      drawerOverlay.classList.add("opacity-0", "pointer-events-none");
+      cartDrawer.setAttribute("aria-hidden", "true");
+    }
 
-// Edit Modal öffnen
-function openEditModal(artikel) {
-    editArtikelId = artikel.id;
-    document.getElementById("edit-name").value = artikel.bezeichnung;
-    document.getElementById("edit-preis").value = artikel.preis;
-    document.getElementById("edit-bestand").value = artikel.bestand;
-    document.getElementById("edit-kategorie").value = artikel.kategorie || "";
-    editModal.classList.remove("hidden");
-}
+    function openEditModal(article) {
+      if (!article) return;
 
-// Edit speichern (PUT)
-async function saveArtikelUpdate() {
-    if (!editArtikelId) return;
+      currentEditId = article.id;
+      document.getElementById("edit-name").value = article.bezeichnung || "";
+      document.getElementById("edit-price").value = article.preis || 0;
+      document.getElementById("edit-stock").value = article.bestand || 0;
+      document.getElementById("edit-category").value = article.kategorie || "";
+      editModal.classList.remove("hidden");
+      editModal.classList.add("flex");
+    }
 
-    const data = {
+    function closeEditModal() {
+      currentEditId = null;
+      editModal.classList.add("hidden");
+      editModal.classList.remove("flex");
+    }
+
+    async function saveArticle() {
+      if (!currentEditId) return;
+
+      const payload = {
         bezeichnung: document.getElementById("edit-name").value.trim(),
-        preis: parseFloat(document.getElementById("edit-preis").value),
-        bestand: parseInt(document.getElementById("edit-bestand").value, 10),
-        kategorie: document.getElementById("edit-kategorie").value.trim()
-    };
+        preis: parseFloat(document.getElementById("edit-price").value),
+        bestand: parseInt(document.getElementById("edit-stock").value, 10),
+        kategorie: document.getElementById("edit-category").value.trim()
+      };
 
-    try {
-        const response = await fetch(`/api/artikel/${editArtikelId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
+      try {
+        await api(`/api/artikel/${currentEditId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
         });
 
-        if (!response.ok) {
-            throw new Error("Speichern fehlgeschlagen");
-        }
-
-        editModal.classList.add("hidden");
-        editArtikelId = null;
-        await ladeArtikel();
-    } catch (error) {
-        console.error("Fehler:", error);
-        alert("Fehler beim Speichern");
+        closeEditModal();
+        await loadArticles();
+        showToast("Artikel erfolgreich aktualisiert.");
+      } catch (error) {
+        showToast(error.message || "Artikel konnte nicht gespeichert werden.", true);
+      }
     }
-}
 
-// Bestellung aufgeben
-async function bestellungAufgeben() {
-    const name = document.getElementById("kunde-name").value.trim();
-    const email = document.getElementById("kunde-email").value.trim();
+    async function submitOrder() {
+      const name = document.getElementById("customer-name").value.trim();
+      const email = document.getElementById("customer-email").value.trim();
 
-    if (!name || !email) {
-        alert("Bitte Name und E-Mail eingeben");
+      if (!name || !email) {
+        showToast("Bitte Name und E-Mail eingeben.", true);
         return;
-    }
+      }
 
-    if (warenkorb.length === 0) {
-        alert("Warenkorb ist leer");
+      if (cart.length === 0) {
+        showToast("Der Warenkorb ist leer.", true);
         return;
-    }
+      }
 
-    try {
-        // 1. Kunde suchen oder anlegen
-        const namen = name.split(" ");
-        const vorname = namen[0];
-        const nachname = namen.slice(1).join(" ") || "-";
+      try {
+        const parts = name.split(" ").filter(Boolean);
+        const vorname = parts[0] || name;
+        const nachname = parts.slice(1).join(" ") || "-";
 
-        // Kunde anlegen
-        const kundeResponse = await fetch("/api/kunden", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                vorname,
-                nachname,
-                email
-            })
+        const kunde = await api("/api/kunden", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ vorname, nachname, email })
         });
 
-        if (!kundeResponse.ok) {
-            throw new Error("Kunde fehlgeschlagen");
-        }
-
-        const kunde = await kundeResponse.json();
-        console.log("Kunde:", kunde);
-
-        // 2. Bestellung
-        const bestellungResponse = await fetch("/api/bestellungen", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                kunde_id: kunde.id,
-                status: "offen"
-            })
+        await api("/api/bestellungen", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            kunde_id: kunde.id,
+            status: "offen"
+          })
         });
 
-        if (!bestellungResponse.ok) {
-            throw new Error("Bestellung fehlgeschlagen");
-        }
-
-        const bestellung = await bestellungResponse.json();
-        console.log("Bestellung:", bestellung);
-
-        // Warenkorb leeren & Modal zeigen
-        warenkorbLeeren();
-        toggleWarenkorb();
-        erfolgModal.classList.remove("hidden");
-    } catch (error) {
-        console.error("Bestellung Error:", error);
-        alert("Fehler bei der Bestellung");
+        clearCart();
+        closeCart();
+        showToast("Bestellung erfolgreich angelegt.");
+      } catch (error) {
+        showToast(error.message || "Bestellung fehlgeschlagen.", true);
+      }
     }
-}
 
-// *************** START ***************
-console.log("Shop initialisiert");
-renderWarenkorb();
-ladeArtikel();
-</script>
+    async function loadArticles() {
+      try {
+        const data = await api("/api/artikel");
+        allArticles = Array.isArray(data) ? data : [];
+        renderCategories();
+        renderArticles();
+      } catch (error) {
+        articleGrid.innerHTML = `
+          <div class="col-span-full rounded-2xl border border-rose-800 bg-rose-950/30 p-8 text-center">
+            <p class="font-medium text-rose-200 mb-1">Artikel konnten nicht geladen werden</p>
+            <p class="text-sm text-rose-300/80">${escapeHtml(error.message)}</p>
+          </div>
+        `;
+        resultCount.textContent = "Fehler beim Laden";
+      }
+    }
 
+    function initTheme() {
+      const root = document.documentElement;
+      const btn = document.getElementById("theme-toggle");
+      const icon = document.getElementById("theme-icon");
+
+      function setTheme(next) {
+        if (next === "light") {
+          root.classList.remove("dark");
+          icon.textContent = "☀️";
+        } else {
+          root.classList.add("dark");
+          icon.textContent = "🌙";
+        }
+        btn.dataset.theme = next;
+      }
+
+      setTheme("dark");
+
+      btn.addEventListener("click", () => {
+        const current = btn.dataset.theme === "dark" ? "light" : "dark";
+        setTheme(current);
+      });
+    }
+
+    document.getElementById("cart-toggle").addEventListener("click", openCart);
+    document.getElementById("cart-close").addEventListener("click", closeCart);
+    drawerOverlay.addEventListener("click", closeCart);
+
+    document.getElementById("clear-cart").addEventListener("click", clearCart);
+    document.getElementById("submit-order").addEventListener("click", submitOrder);
+
+    document.getElementById("edit-close").addEventListener("click", closeEditModal);
+    document.getElementById("edit-cancel").addEventListener("click", closeEditModal);
+    document.getElementById("edit-save").addEventListener("click", saveArticle);
+
+    document.getElementById("reset-filters").addEventListener("click", () => {
+      selectedCategory = "Alle";
+      searchInput.value = "";
+      renderCategories();
+      renderArticles();
+    });
+
+    searchInput.addEventListener("input", renderArticles);
+
+    initTheme();
+    renderCart();
+    loadArticles();
+  </script>
 </body>
 </html>
