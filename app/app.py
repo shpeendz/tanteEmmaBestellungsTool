@@ -41,10 +41,9 @@ if __name__ == '__main__':
         db.create_all()
         print('Tabellen erstellt!')
 
-        # Seed data only if empty
         if Lieferant.query.count() == 0:
             from seed import seed_daten
             seed_daten()
             print('Testdaten eingefügt!')
 
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
