@@ -2,27 +2,85 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Tante Emma Shop</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
-<body>
-    <h1>Admin Dashboard</h1>
+<body class="page-dark">
+    <header class="site-header">
+        <div class="container nav">
+            <div class="brand">
+                <div class="brand-logo">T</div>
+                <div>
+                    <p class="eyebrow">Adminbereich</p>
+                    <h1 class="brand-title">Tante Emma Dashboard</h1>
+                </div>
+            </div>
 
-    <p>Artikel: {{ artikel_anzahl }}</p>
-    <p>Kunden: {{ kunden_anzahl }}</p>
-    <p>Bestellungen: {{ bestellungen_anzahl }}</p>
-    <p>Lieferungen: {{ lieferungen_anzahl }}</p>
+            <div class="nav-actions">
+                <a class="btn btn-secondary" href="/">Shop Startseite</a>
+                <a class="btn btn-primary" href="/admin/logout">Logout</a>
+            </div>
+        </div>
+    </header>
 
-    <h2>Letzte Bestellungen</h2>
-    <ul>
-        {% for bestellung in letzte_bestellungen %}
-            <li>
-                Bestellung #{{ bestellung.BestellungID }} |
-                Kunde-ID: {{ bestellung.KundeID }} |
-                Status: {{ bestellung.Status }}
-            </li>
-        {% endfor %}
-    </ul>
+    <main class="dashboard-main">
+        <div class="container">
+            <section class="section-head">
+                <p class="eyebrow accent">Übersicht</p>
+                <h2>Systemstatus</h2>
+            </section>
 
-    <p><a href="/admin/logout">Logout</a></p>
+            <section class="dashboard-grid">
+                <article class="dashboard-card stat">
+                    <span class="stat-label">Artikel</span>
+                    <strong>{{ artikel_anzahl }}</strong>
+                </article>
+
+                <article class="dashboard-card stat">
+                    <span class="stat-label">Kunden</span>
+                    <strong>{{ kunden_anzahl }}</strong>
+                </article>
+
+                <article class="dashboard-card stat">
+                    <span class="stat-label">Bestellungen</span>
+                    <strong>{{ bestellungen_anzahl }}</strong>
+                </article>
+
+                <article class="dashboard-card stat">
+                    <span class="stat-label">Lieferungen</span>
+                    <strong>{{ lieferungen_anzahl }}</strong>
+                </article>
+            </section>
+
+            <section class="table-section">
+                <div class="section-head">
+                    <p class="eyebrow accent">Aktivität</p>
+                    <h3>Letzte Bestellungen</h3>
+                </div>
+
+                <div class="table-card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Bestellung</th>
+                                <th>Kunde</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bestellung in letzte_bestellungen %}
+                            <tr>
+                                <td>#{{ bestellung.BestellungID }}</td>
+                                <td>{{ bestellung.KundeID }}</td>
+                                <td>{{ bestellung.Status }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
 </body>
 </html>

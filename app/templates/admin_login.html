@@ -2,31 +2,58 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Tante Emma Shop</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
-<body>
-    <h1>Admin Login</h1>
+<body class="page-dark auth-page">
+    <main class="auth-shell">
+        <section class="auth-panel auth-info">
+            <p class="eyebrow accent">Adminbereich</p>
+            <h1>Willkommen zurück</h1>
+            <p>
+                Melde dich an, um Bestellungen, Kunden, Artikel und Lieferungen zu verwalten.
+            </p>
 
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-          <p style="color:red;">{{ message }}</p>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+            <ul class="info-list">
+                <li>Geschützter Adminzugang</li>
+                <li>Übersicht über Bestellungen</li>
+                <li>Verwaltung von Artikeln und Kunden</li>
+            </ul>
 
-    <form method="POST">
-        <div>
-            <label for="username">Benutzername</label>
-            <input type="text" id="username" name="username" required>
-        </div>
+            <a class="btn btn-secondary" href="/">Zurück zur Startseite</a>
+        </section>
 
-        <div>
-            <label for="password">Passwort</label>
-            <input type="password" id="password" name="password" required>
-        </div>
+        <section class="auth-panel auth-form-wrap">
+            <div class="login-card">
+                <p class="eyebrow">Login</p>
+                <h2>Admin Anmeldung</h2>
 
-        <button type="submit">Einloggen</button>
-    </form>
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    <div class="alert-box">
+                      {% for message in messages %}
+                        <p>{{ message }}</p>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+
+                <form method="POST" class="login-form">
+                    <div class="form-group">
+                        <label for="username">Benutzername</label>
+                        <input type="text" id="username" name="username" placeholder="admin" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Passwort</label>
+                        <input type="password" id="password" name="password" placeholder="••••••••" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">Einloggen</button>
+                </form>
+            </div>
+        </section>
+    </main>
 </body>
 </html>
