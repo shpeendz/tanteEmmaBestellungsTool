@@ -117,9 +117,11 @@
 </div>
 
 <script>
+// *************** WARENKORB ***************
 let warenkorb = [];
 let editArtikelId = null;
 
+// DOM Elemente
 const artikelGrid = document.getElementById("artikel-grid");
 const warenkorbPanel = document.getElementById("warenkorb-panel");
 const warenkorbListe = document.getElementById("warenkorb-liste");
@@ -128,18 +130,21 @@ const warenkorbGesamt = document.getElementById("warenkorb-gesamt");
 const erfolgModal = document.getElementById("erfolg-modal");
 const editModal = document.getElementById("edit-modal");
 
+// Event Listeners
 document.getElementById("warenkorb-toggle").addEventListener("click", toggleWarenkorb);
 document.getElementById("warenkorb-leeren").addEventListener("click", warenkorbLeeren);
 document.getElementById("bestellung-button").addEventListener("click", bestellungAufgeben);
-document.getElementById("modal-close").addEventListener("click", schliesseModal);
-document.getElementById("edit-cancel").addEventListener("click", closeEditModal);
+document.getElementById("modal-close").addEventListener("click", () => erfolgModal.classList.add("hidden"));
+document.getElementById("edit-cancel").addEventListener("click", () => editModal.classList.add("hidden"));
 document.getElementById("edit-save").addEventListener("click", saveArtikelUpdate);
 
+// Warenkorb öffnen/schließen
 function toggleWarenkorb() {
     warenkorbPanel.classList.toggle("hidden");
     warenkorbPanel.classList.toggle("flex");
 }
 
+// Kategorie Icon
 function kategorieIcon(kat) {
     const icons = {
         Obst: "🍎",
@@ -149,101 +154,138 @@ function kategorieIcon(kat) {
         Gemüse: "🥦",
         Fleisch: "🥩"
     };
-    return icons[kat] ?? "📦";
+    return icons[kat] || "📦";
 }
 
-function escapeHtml(value) {
-    return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+// HTML escaping (verhindert Fehler bei Apostrophen)
+function escapeHtml(text) {
+    const map = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+    };
+    return String(text).replace(/[&<>"']/g, m => map[m]);
 }
 
+// Artikel laden
 async function ladeArtikel() {
-    artikelGrid.innerHTML = `<p class="text-gray-500 text-sm">Lädt Artikel...</p>`;
+    console.log("Artikel werden geladen...");
+    artikelGrid.innerHTML = '<p class="text-gray-500 text-sm">Lädt Artikel...</p>';
 
     try {
         const response = await fetch("/api/artikel");
+        console.log("Response Status:", response.status);
+
         if (!response.ok) {
+            console.error("HTTP Error:", response.status);
             throw new Error("Artikel konnten nicht geladen werden");
         }
 
-        const data = await response.json();
+        const artikel = await response.json();
+        console.log("Artikel geladen:", artikel);
 
-        if (!Array.isArray(data) || data.length === 0) {
-            artikelGrid.innerHTML = `<p class="text-gray-500 text-sm">Keine Artikel gefunden.</p>`;
+        if (artikel.length === 0) {
+            artikelGrid.innerHTML = '<p class="text-gray-500 text-sm">Keine Artikel gefunden.</p>';
             return;
         }
 
-        artikelGrid.innerHTML = data.map(a => `
+        // HTML rendern
+        artikelGrid.innerHTML = artikel.map(a => `
             <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col gap-3">
                 <div class="text-4xl">${kategorieIcon(a.kategorie)}</div>
-
                 <h3 class="font-medium text-sm">${escapeHtml(a.bezeichnung)}</h3>
-                <p class="text-xs text-gray-500">${escapeHtml(a.kategorie ?? "–")}</p>
-
+                <p class="text-xs text-gray-500">${escapeHtml(a.kategorie || "–")}</p>
                 <div class="flex justify-between text-sm">
-                    <span class="text-teal-400 font-bold">${Number(a.preis).toFixed(2)} €</span>
+                    <span class="text-teal-400 font-bold">${a.preis.toFixed(2)} €</span>
                     <span class="text-xs text-gray-600">Bestand: ${a.bestand}</span>
                 </div>
-
                 <div class="flex gap-2">
                     ${a.bestand > 0
-                        ? `<button class="flex-1 bg-gray-800 hover:bg-teal-900 text-sm py-1.5 rounded add-cart-btn" data-id="${a.id}">
-                                + Warenkorb
-                           </button>`
+                        ? `<button class="flex-1 bg-gray-800 hover:bg-teal-900 text-sm py-1.5 rounded"
+                            data-id="${a.id}"
+                            data-bezeichnung="${escapeHtml(a.bezeichnung)}"
+                            data-preis="${a.preis}">
+                            + Warenkorb
+                          </button>`
                         : `<button disabled class="flex-1 bg-gray-800 text-gray-600 text-sm py-1.5 rounded">
-                                Ausverkauft
-                           </button>`
+                            Ausverkauft
+                          </button>`
                     }
-
-                    <button class="px-3 bg-gray-700 hover:bg-gray-600 rounded edit-btn" data-id="${a.id}">
+                    <button class="px-3 bg-gray-700 hover:bg-gray-600 rounded"
+                        data-id="${a.id}"
+                        data-bezeichnung="${escapeHtml(a.bezeichnung)}"
+                        data-preis="${a.preis}"
+                        data-bestand="${a.bestand}"
+                        data-kategorie="${escapeHtml(a.kategorie || "")}">
                         ✏️
                     </button>
                 </div>
             </div>
         `).join("");
 
-        data.forEach(a => {
-            const addBtn = artikelGrid.querySelector(`.add-cart-btn[data-id="${a.id}"]`);
-            const editBtn = artikelGrid.querySelector(`.edit-btn[data-id="${a.id}"]`);
-
-            if (addBtn) {
-                addBtn.addEventListener("click", () => inWarenkorb(a));
+        // Event Listeners für Buttons
+        // "Warenkorb" Buttons
+        artikelGrid.querySelectorAll("[data-id]").forEach(btn => {
+            if (btn.textContent.includes("+ Warenkorb")) {
+                btn.addEventListener("click", () => {
+                    const artikel = {
+                        id: parseInt(btn.dataset.id),
+                        bezeichnung: btn.dataset.bezeichnung,
+                        preis: parseFloat(btn.dataset.preis)
+                    };
+                    inWarenkorb(artikel);
+                });
             }
-
-            if (editBtn) {
-                editBtn.addEventListener("click", () => openEditModal(a));
+            // "Edit" Buttons
+            if (btn.textContent.includes("✏️")) {
+                btn.addEventListener("click", () => {
+                    const artikel = {
+                        id: parseInt(btn.dataset.id),
+                        bezeichnung: btn.dataset.bezeichnung,
+                        preis: parseFloat(btn.dataset.preis),
+                        bestand: parseInt(btn.dataset.bestand),
+                        kategorie: btn.dataset.kategorie
+                    };
+                    openEditModal(artikel);
+                });
             }
         });
+
     } catch (error) {
-        artikelGrid.innerHTML = `<p class="text-red-400 text-sm">Fehler beim Laden der Artikel.</p>`;
-        console.error(error);
+        console.error("Fehler beim Laden:", error);
+        artikelGrid.innerHTML = '<p class="text-red-400 text-sm">Fehler beim Laden der Artikel.</p>';
     }
 }
 
+// Ware in Warenkorb
 function inWarenkorb(artikel) {
-    const vorhandener = warenkorb.find(a => a.id === artikel.id);
+    console.log("In Warenkorb:", artikel);
 
-    if (vorhandener) {
-        vorhandener.menge += 1;
+    const existierend = warenkorb.find(a => a.id === artikel.id);
+
+    if (existierend) {
+        existierend.menge++;
     } else {
         warenkorb.push({
             id: artikel.id,
             bezeichnung: artikel.bezeichnung,
-            preis: Number(artikel.preis),
+            preis: artikel.preis,
             menge: 1
         });
     }
 
     renderWarenkorb();
+    console.log("Warenkorb jetzt:", warenkorb);
 }
 
+// Warenkorb renderen
 function renderWarenkorb() {
+    console.log("Warenkorb renderen:", warenkorb);
+
     if (warenkorb.length === 0) {
-        warenkorbListe.innerHTML = `<p class="text-sm text-gray-500">Noch keine Artikel im Warenkorb.</p>`;
+        warenkorbListe.innerHTML = '<p class="text-sm text-gray-500">Noch keine Artikel.</p>';
         warenkorbAnzahl.textContent = "0";
         warenkorbGesamt.textContent = "0.00 €";
         return;
@@ -256,28 +298,31 @@ function renderWarenkorb() {
                 <p class="text-xs text-gray-400">${item.menge} × ${item.preis.toFixed(2)} €</p>
             </div>
             <div class="flex items-center gap-2">
-                <button class="text-xs px-2 py-1 bg-gray-700 rounded remove-one-btn" data-id="${item.id}">−</button>
+                <button class="text-xs px-2 py-1 bg-gray-700 rounded minus-btn" data-id="${item.id}">−</button>
                 <span class="text-sm">${item.menge}</span>
-                <button class="text-xs px-2 py-1 bg-gray-700 rounded add-one-btn" data-id="${item.id}">+</button>
+                <button class="text-xs px-2 py-1 bg-gray-700 rounded plus-btn" data-id="${item.id}">+</button>
             </div>
         </div>
     `).join("");
 
+    // Gesamt berechnen
     const count = warenkorb.reduce((sum, item) => sum + item.menge, 0);
     const total = warenkorb.reduce((sum, item) => sum + item.preis * item.menge, 0);
 
     warenkorbAnzahl.textContent = count;
     warenkorbGesamt.textContent = `${total.toFixed(2)} €`;
 
-    warenkorb.forEach(item => {
-        const addBtn = warenkorbListe.querySelector(`.add-one-btn[data-id="${item.id}"]`);
-        const removeBtn = warenkorbListe.querySelector(`.remove-one-btn[data-id="${item.id}"]`);
+    // +/- Buttons
+    warenkorbListe.querySelectorAll(".plus-btn").forEach(btn => {
+        btn.addEventListener("click", () => mengeAendern(parseInt(btn.dataset.id), 1));
+    });
 
-        if (addBtn) addBtn.addEventListener("click", () => mengeAendern(item.id, 1));
-        if (removeBtn) addBtn && removeBtn.addEventListener("click", () => mengeAendern(item.id, -1));
+    warenkorbListe.querySelectorAll(".minus-btn").forEach(btn => {
+        btn.addEventListener("click", () => mengeAendern(parseInt(btn.dataset.id), -1));
     });
 }
 
+// Menge ändern
 function mengeAendern(id, delta) {
     const item = warenkorb.find(a => a.id === id);
     if (!item) return;
@@ -291,25 +336,23 @@ function mengeAendern(id, delta) {
     renderWarenkorb();
 }
 
+// Warenkorb leeren
 function warenkorbLeeren() {
     warenkorb = [];
     renderWarenkorb();
 }
 
+// Edit Modal öffnen
 function openEditModal(artikel) {
     editArtikelId = artikel.id;
-    document.getElementById("edit-name").value = artikel.bezeichnung ?? "";
-    document.getElementById("edit-preis").value = artikel.preis ?? 0;
-    document.getElementById("edit-bestand").value = artikel.bestand ?? 0;
-    document.getElementById("edit-kategorie").value = artikel.kategorie ?? "";
+    document.getElementById("edit-name").value = artikel.bezeichnung;
+    document.getElementById("edit-preis").value = artikel.preis;
+    document.getElementById("edit-bestand").value = artikel.bestand;
+    document.getElementById("edit-kategorie").value = artikel.kategorie || "";
     editModal.classList.remove("hidden");
 }
 
-function closeEditModal() {
-    editModal.classList.add("hidden");
-    editArtikelId = null;
-}
-
+// Edit speichern (PUT)
 async function saveArtikelUpdate() {
     if (!editArtikelId) return;
 
@@ -328,37 +371,41 @@ async function saveArtikelUpdate() {
         });
 
         if (!response.ok) {
-            throw new Error("Artikel konnte nicht gespeichert werden");
+            throw new Error("Speichern fehlgeschlagen");
         }
 
-        closeEditModal();
+        editModal.classList.add("hidden");
+        editArtikelId = null;
         await ladeArtikel();
     } catch (error) {
-        alert("Fehler beim Speichern des Artikels.");
-        console.error(error);
+        console.error("Fehler:", error);
+        alert("Fehler beim Speichern");
     }
 }
 
+// Bestellung aufgeben
 async function bestellungAufgeben() {
     const name = document.getElementById("kunde-name").value.trim();
     const email = document.getElementById("kunde-email").value.trim();
 
     if (!name || !email) {
-        alert("Bitte Name und E-Mail eingeben.");
+        alert("Bitte Name und E-Mail eingeben");
         return;
     }
 
     if (warenkorb.length === 0) {
-        alert("Dein Warenkorb ist leer.");
+        alert("Warenkorb ist leer");
         return;
     }
 
     try {
-        const namenTeile = name.split(" ");
-        const vorname = namenTeile[0] || name;
-        const nachname = namenTeile.slice(1).join(" ") || "-";
+        // 1. Kunde suchen oder anlegen
+        const namen = name.split(" ");
+        const vorname = namen[0];
+        const nachname = namen.slice(1).join(" ") || "-";
 
-        const kundenResponse = await fetch("/api/kunden", {
+        // Kunde anlegen
+        const kundeResponse = await fetch("/api/kunden", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -368,12 +415,14 @@ async function bestellungAufgeben() {
             })
         });
 
-        if (!kundenResponse.ok) {
-            throw new Error("Kunde konnte nicht angelegt werden");
+        if (!kundeResponse.ok) {
+            throw new Error("Kunde fehlgeschlagen");
         }
 
-        const kunde = await kundenResponse.json();
+        const kunde = await kundeResponse.json();
+        console.log("Kunde:", kunde);
 
+        // 2. Bestellung
         const bestellungResponse = await fetch("/api/bestellungen", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -384,21 +433,24 @@ async function bestellungAufgeben() {
         });
 
         if (!bestellungResponse.ok) {
-            throw new Error("Bestellung konnte nicht angelegt werden");
+            throw new Error("Bestellung fehlgeschlagen");
         }
 
+        const bestellung = await bestellungResponse.json();
+        console.log("Bestellung:", bestellung);
+
+        // Warenkorb leeren & Modal zeigen
         warenkorbLeeren();
+        toggleWarenkorb();
         erfolgModal.classList.remove("hidden");
     } catch (error) {
-        alert("Fehler beim Aufgeben der Bestellung.");
-        console.error(error);
+        console.error("Bestellung Error:", error);
+        alert("Fehler bei der Bestellung");
     }
 }
 
-function schliesseModal() {
-    erfolgModal.classList.add("hidden");
-}
-
+// *************** START ***************
+console.log("Shop initialisiert");
 renderWarenkorb();
 ladeArtikel();
 </script>
