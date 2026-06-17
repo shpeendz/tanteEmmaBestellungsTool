@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+
+    <p>Artikel: {{ artikel_anzahl }}</p>
+    <p>Kunden: {{ kunden_anzahl }}</p>
+    <p>Bestellungen: {{ bestellungen_anzahl }}</p>
+    <p>Lieferungen: {{ lieferungen_anzahl }}</p>
+
+    <h2>Letzte Bestellungen</h2>
+    <ul>
+        {% for bestellung in letzte_bestellungen %}
+            <li>
+                Bestellung #{{ bestellung.BestellungID }} |
+                Kunde-ID: {{ bestellung.KundeID }} |
+                Status: {{ bestellung.Status }}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <p><a href="/admin/logout">Logout</a></p>
+</body>
+</html>
