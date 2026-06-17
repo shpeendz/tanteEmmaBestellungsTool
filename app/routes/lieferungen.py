@@ -21,11 +21,10 @@ def lieferung_to_dict(l):
 
 def create_lieferung_from_json(data):
     return Lieferung(
-        LieferungID=int(data["id"]),
-        BestellungID=int(data["bestellung_id"]),
+        BestellungID=int(data["bestellung_id"]) if data.get("bestellung_id") is not None else None,
         MitarbeiterID=int(data["mitarbeiter_id"]) if data.get("mitarbeiter_id") is not None else None,
         Lieferdatum=data.get("lieferdatum"),
-        Status=data.get("status")
+        Status=data.get("status", "geplant")
     )
 
 
@@ -54,8 +53,8 @@ def create_lieferung():
     if data is None:
         return jsonify({"error": "Ungültiges JSON"}), 400
 
-    if "id" not in data or "bestellung_id" not in data:
-        return jsonify({"error": "Pflichtfelder: id, bestellung_id"}), 400
+    if "bestellung_id" not in data:
+        return jsonify({"error": "Pflichtfeld: bestellung_id"}), 400
 
     try:
         neue_lieferung = create_lieferung_from_json(data)
@@ -63,7 +62,7 @@ def create_lieferung():
         db.session.commit()
     except ValueError:
         db.session.rollback()
-        return jsonify({"error": "id, bestellung_id oder mitarbeiter_id müssen Zahlen sein"}), 400
+        return jsonify({"error": "bestellung_id oder mitarbeiter_id müssen Zahlen sein"}), 400
     except Exception:
         db.session.rollback()
         return jsonify({"error": "Lieferung konnte nicht gespeichert werden"}), 500
@@ -87,7 +86,7 @@ def update_lieferung(lieferung_id):
 
     try:
         if "bestellung_id" in data:
-            lieferung.BestellungID = int(data["bestellung_id"])
+            lieferung.BestellungID = int(data["bestellung_id"]) if data["bestellung_id"] is not None else None
 
         if "mitarbeiter_id" in data:
             lieferung.MitarbeiterID = int(data["mitarbeiter_id"]) if data["mitarbeiter_id"] is not None else None

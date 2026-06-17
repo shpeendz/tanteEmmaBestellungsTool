@@ -22,9 +22,9 @@ def kunde_to_dict(k):
 
 def create_kunde_from_json(data):
     return Kunde(
-        Vorname=data["vorname"].strip(),
-        Nachname=data["nachname"].strip(),
-        Email=data.get("email"),
+        Vorname=str(data["vorname"]).strip(),
+        Nachname=str(data["nachname"]).strip(),
+        Email=str(data["email"]).strip(),
         Telefon=data.get("telefon"),
         Adresse=data.get("adresse")
     )
@@ -55,11 +55,11 @@ def create_kunde():
     if data is None:
         return jsonify({"error": "Ungültiges JSON"}), 400
 
-    if "vorname" not in data or "nachname" not in data:
-        return jsonify({"error": "Pflichtfelder: vorname, nachname"}), 400
+    if "vorname" not in data or "nachname" not in data or "email" not in data:
+        return jsonify({"error": "Pflichtfelder: vorname, nachname, email"}), 400
 
-    if not str(data["vorname"]).strip() or not str(data["nachname"]).strip():
-        return jsonify({"error": "Vorname und Nachname dürfen nicht leer sein"}), 400
+    if not str(data["vorname"]).strip() or not str(data["nachname"]).strip() or not str(data["email"]).strip():
+        return jsonify({"error": "Vorname, Nachname und Email dürfen nicht leer sein"}), 400
 
     try:
         neuer_kunde = create_kunde_from_json(data)
@@ -90,15 +90,17 @@ def update_kunde(kunden_id):
         if "vorname" in data:
             if not str(data["vorname"]).strip():
                 return jsonify({"error": "Vorname darf nicht leer sein"}), 400
-            kunde.Vorname = data["vorname"].strip()
+            kunde.Vorname = str(data["vorname"]).strip()
 
         if "nachname" in data:
             if not str(data["nachname"]).strip():
                 return jsonify({"error": "Nachname darf nicht leer sein"}), 400
-            kunde.Nachname = data["nachname"].strip()
+            kunde.Nachname = str(data["nachname"]).strip()
 
         if "email" in data:
-            kunde.Email = data["email"]
+            if not str(data["email"]).strip():
+                return jsonify({"error": "Email darf nicht leer sein"}), 400
+            kunde.Email = str(data["email"]).strip()
 
         if "telefon" in data:
             kunde.Telefon = data["telefon"]
