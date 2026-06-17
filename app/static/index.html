@@ -5,24 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tante Emma Shop</title>
 
-    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config = { darkMode: 'class' }</script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
 
-    <!-- ✅ DEIN CSS -->
     <link rel="stylesheet" href="/static/style.css">
 </head>
-
 <body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col">
 
-<!-- HEADER -->
 <header class="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
     <div class="flex items-center gap-3">
         <div class="bg-teal-500 rounded-lg w-8 h-8 flex items-center justify-center text-black font-bold text-sm">T</div>
         <h1 class="text-lg font-semibold">Tante Emma Shop</h1>
     </div>
 
-    <button onclick="toggleWarenkorb()"
+    <button id="warenkorb-toggle"
         class="relative flex items-center gap-2 bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg text-sm transition">
         🛒 Warenkorb
         <span id="warenkorb-anzahl"
@@ -32,70 +30,61 @@
     </button>
 </header>
 
-<!-- MAIN -->
 <div class="flex flex-1">
-
-    <!-- ARTIKEL -->
     <main class="flex-1 p-6">
         <h2 class="text-xl font-semibold mb-6">Unser Sortiment</h2>
-
-        <div id="artikel-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div id="artikel-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <p class="text-gray-500 text-sm">Lädt Artikel...</p>
         </div>
     </main>
 
-    <!-- WARENKORB -->
     <aside id="warenkorb-panel"
-        class="hidden w-80 bg-gray-900 border-l border-gray-800 p-5 flex flex-col">
-
+        class="hidden w-80 bg-gray-900 border-l border-gray-800 p-5 flex-col">
         <h2 class="text-base font-semibold mb-4">🛒 Warenkorb</h2>
 
-        <div id="warenkorb-liste" class="flex-1 flex flex-col gap-2 overflow-y-auto"></div>
+        <div id="warenkorb-liste" class="flex-1 flex flex-col gap-2 overflow-y-auto">
+            <p class="text-sm text-gray-500">Noch keine Artikel im Warenkorb.</p>
+        </div>
 
         <div class="border-t border-gray-800 pt-4 mt-4">
-
             <div class="flex justify-between text-sm mb-4">
                 <span class="text-gray-400">Gesamt</span>
                 <span class="font-bold text-teal-400" id="warenkorb-gesamt">0.00 €</span>
             </div>
 
-            <input id="kunde-name" type="text" placeholder="Dein Name"
+            <input id="kunde-name" type="text" placeholder="Dein Vor- und Nachname"
                 class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm w-full mb-2">
 
             <input id="kunde-email" type="email" placeholder="Deine E-Mail"
                 class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm w-full mb-3">
 
-            <button onclick="bestellungAufgeben()"
+            <button id="bestellung-button"
                 class="w-full bg-teal-500 hover:bg-teal-400 text-black font-semibold py-2 rounded-lg text-sm">
                 Bestellung aufgeben
             </button>
 
-            <button onclick="warenkorbLeeren()"
+            <button id="warenkorb-leeren"
                 class="w-full mt-2 text-gray-500 hover:text-gray-300 text-xs">
                 Warenkorb leeren
             </button>
         </div>
     </aside>
-
 </div>
 
-<!-- SUCCESS MODAL -->
-<div id="erfolg-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+<div id="erfolg-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
     <div class="bg-gray-900 border border-gray-800 rounded-2xl p-8 max-w-sm w-full text-center">
         <div class="text-5xl mb-4">🎉</div>
         <h3 class="text-xl font-bold mb-2">Bestellung aufgegeben!</h3>
         <p class="text-gray-400 text-sm mb-6">Deine Bestellung wurde erfolgreich gespeichert.</p>
-        <button onclick="schliesseModal()"
+        <button id="modal-close"
             class="bg-teal-500 hover:bg-teal-400 text-black font-semibold px-6 py-2 rounded-lg text-sm">
             Weiter einkaufen
         </button>
     </div>
 </div>
 
-<!-- 🆕 EDIT MODAL (PUT SUPPORT) -->
-<div id="edit-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+<div id="edit-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
     <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 max-w-md w-full">
-
         <h3 class="text-lg font-bold mb-4">Artikel bearbeiten</h3>
 
         <input id="edit-name" class="w-full mb-2 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm"
@@ -114,12 +103,12 @@
                placeholder="Kategorie">
 
         <div class="flex gap-2">
-            <button onclick="saveArtikelUpdate()"
+            <button id="edit-save"
                 class="flex-1 bg-teal-500 hover:bg-teal-400 text-black font-semibold py-2 rounded">
                 Speichern
             </button>
 
-            <button onclick="closeEditModal()"
+            <button id="edit-cancel"
                 class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 py-2 rounded">
                 Abbrechen
             </button>
@@ -127,109 +116,290 @@
     </div>
 </div>
 
-<!-- SCRIPT -->
 <script>
 let warenkorb = [];
 let editArtikelId = null;
 
-// Warenkorb togglen
+const artikelGrid = document.getElementById("artikel-grid");
+const warenkorbPanel = document.getElementById("warenkorb-panel");
+const warenkorbListe = document.getElementById("warenkorb-liste");
+const warenkorbAnzahl = document.getElementById("warenkorb-anzahl");
+const warenkorbGesamt = document.getElementById("warenkorb-gesamt");
+const erfolgModal = document.getElementById("erfolg-modal");
+const editModal = document.getElementById("edit-modal");
+
+document.getElementById("warenkorb-toggle").addEventListener("click", toggleWarenkorb);
+document.getElementById("warenkorb-leeren").addEventListener("click", warenkorbLeeren);
+document.getElementById("bestellung-button").addEventListener("click", bestellungAufgeben);
+document.getElementById("modal-close").addEventListener("click", schliesseModal);
+document.getElementById("edit-cancel").addEventListener("click", closeEditModal);
+document.getElementById("edit-save").addEventListener("click", saveArtikelUpdate);
+
 function toggleWarenkorb() {
-    const panel = document.getElementById('warenkorb-panel');
-    panel.classList.toggle('hidden');
-    panel.classList.toggle('flex');
+    warenkorbPanel.classList.toggle("hidden");
+    warenkorbPanel.classList.toggle("flex");
 }
 
-// Artikel laden
-async function ladeArtikel() {
-    const data = await fetch("/api/artikel").then(r => r.json());
-    const grid = document.getElementById('artikel-grid');
-
-    grid.innerHTML = data.map(a => `
-        <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col gap-3">
-
-            <div class="text-4xl">${kategorieIcon(a.kategorie)}</div>
-
-            <h3 class="font-medium text-sm">${a.bezeichnung}</h3>
-
-            <p class="text-xs text-gray-500">${a.kategorie ?? '–'}</p>
-
-            <div class="flex justify-between text-sm">
-                <span class="text-teal-400 font-bold">${a.preis.toFixed(2)} €</span>
-                <span class="text-xs text-gray-600">Bestand: ${a.bestand}</span>
-            </div>
-
-            <div class="flex gap-2">
-
-                ${a.bestand > 0
-                    ? `<button onclick="inWarenkorb(${a.id}, '${a.bezeichnung}', ${a.preis})"
-                        class="flex-1 bg-gray-800 hover:bg-teal-900 text-sm py-1.5 rounded">
-                        + Warenkorb
-                    </button>`
-                    : `<button disabled class="flex-1 bg-gray-800 text-gray-600 text-sm py-1.5 rounded">
-                        Ausverkauft
-                    </button>`
-                }
-
-                <button onclick="openEditModal(${a.id}, '${a.bezeichnung}', ${a.preis}, ${a.bestand}, '${a.kategorie}')"
-                    class="px-3 bg-gray-700 hover:bg-gray-600 rounded">
-                    ✏️
-                </button>
-
-            </div>
-        </div>
-    `).join('');
-}
-
-// Kategorie Icon
 function kategorieIcon(kat) {
     const icons = {
-        'Obst': '🍎',
-        'Milch': '🥛',
-        'Bio': '🌿',
-        'Backwaren': '🍞',
-        'Gemüse': '🥦',
-        'Fleisch': '🥩'
+        Obst: "🍎",
+        Milch: "🥛",
+        Bio: "🌿",
+        Backwaren: "🍞",
+        Gemüse: "🥦",
+        Fleisch: "🥩"
     };
-    return icons[kat] ?? '📦';
+    return icons[kat] ?? "📦";
 }
 
-// EDIT OPEN
-function openEditModal(id, name, preis, bestand, kategorie) {
-    editArtikelId = id;
-
-    document.getElementById('edit-name').value = name;
-    document.getElementById('edit-preis').value = preis;
-    document.getElementById('edit-bestand').value = bestand;
-    document.getElementById('edit-kategorie').value = kategorie;
-
-    document.getElementById('edit-modal').classList.remove('hidden');
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
 
-// CLOSE EDIT
-function closeEditModal() {
-    document.getElementById('edit-modal').classList.add('hidden');
+async function ladeArtikel() {
+    artikelGrid.innerHTML = `<p class="text-gray-500 text-sm">Lädt Artikel...</p>`;
+
+    try {
+        const response = await fetch("/api/artikel");
+        if (!response.ok) {
+            throw new Error("Artikel konnten nicht geladen werden");
+        }
+
+        const data = await response.json();
+
+        if (!Array.isArray(data) || data.length === 0) {
+            artikelGrid.innerHTML = `<p class="text-gray-500 text-sm">Keine Artikel gefunden.</p>`;
+            return;
+        }
+
+        artikelGrid.innerHTML = data.map(a => `
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col gap-3">
+                <div class="text-4xl">${kategorieIcon(a.kategorie)}</div>
+
+                <h3 class="font-medium text-sm">${escapeHtml(a.bezeichnung)}</h3>
+                <p class="text-xs text-gray-500">${escapeHtml(a.kategorie ?? "–")}</p>
+
+                <div class="flex justify-between text-sm">
+                    <span class="text-teal-400 font-bold">${Number(a.preis).toFixed(2)} €</span>
+                    <span class="text-xs text-gray-600">Bestand: ${a.bestand}</span>
+                </div>
+
+                <div class="flex gap-2">
+                    ${a.bestand > 0
+                        ? `<button class="flex-1 bg-gray-800 hover:bg-teal-900 text-sm py-1.5 rounded add-cart-btn" data-id="${a.id}">
+                                + Warenkorb
+                           </button>`
+                        : `<button disabled class="flex-1 bg-gray-800 text-gray-600 text-sm py-1.5 rounded">
+                                Ausverkauft
+                           </button>`
+                    }
+
+                    <button class="px-3 bg-gray-700 hover:bg-gray-600 rounded edit-btn" data-id="${a.id}">
+                        ✏️
+                    </button>
+                </div>
+            </div>
+        `).join("");
+
+        data.forEach(a => {
+            const addBtn = artikelGrid.querySelector(`.add-cart-btn[data-id="${a.id}"]`);
+            const editBtn = artikelGrid.querySelector(`.edit-btn[data-id="${a.id}"]`);
+
+            if (addBtn) {
+                addBtn.addEventListener("click", () => inWarenkorb(a));
+            }
+
+            if (editBtn) {
+                editBtn.addEventListener("click", () => openEditModal(a));
+            }
+        });
+    } catch (error) {
+        artikelGrid.innerHTML = `<p class="text-red-400 text-sm">Fehler beim Laden der Artikel.</p>`;
+        console.error(error);
+    }
 }
 
-// PUT REQUEST
-async function saveArtikelUpdate() {
-    const data = {
-        bezeichnung: document.getElementById('edit-name').value,
-        preis: parseFloat(document.getElementById('edit-preis').value),
-        bestand: parseInt(document.getElementById('edit-bestand').value),
-        kategorie: document.getElementById('edit-kategorie').value
-    };
+function inWarenkorb(artikel) {
+    const vorhandener = warenkorb.find(a => a.id === artikel.id);
 
-    await fetch(`/api/artikel/${editArtikelId}`, {
-        method: "PUT",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(data)
+    if (vorhandener) {
+        vorhandener.menge += 1;
+    } else {
+        warenkorb.push({
+            id: artikel.id,
+            bezeichnung: artikel.bezeichnung,
+            preis: Number(artikel.preis),
+            menge: 1
+        });
+    }
+
+    renderWarenkorb();
+}
+
+function renderWarenkorb() {
+    if (warenkorb.length === 0) {
+        warenkorbListe.innerHTML = `<p class="text-sm text-gray-500">Noch keine Artikel im Warenkorb.</p>`;
+        warenkorbAnzahl.textContent = "0";
+        warenkorbGesamt.textContent = "0.00 €";
+        return;
+    }
+
+    warenkorbListe.innerHTML = warenkorb.map(item => `
+        <div class="bg-gray-800 rounded-lg p-3 flex justify-between items-center">
+            <div>
+                <p class="text-sm font-medium">${escapeHtml(item.bezeichnung)}</p>
+                <p class="text-xs text-gray-400">${item.menge} × ${item.preis.toFixed(2)} €</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button class="text-xs px-2 py-1 bg-gray-700 rounded remove-one-btn" data-id="${item.id}">−</button>
+                <span class="text-sm">${item.menge}</span>
+                <button class="text-xs px-2 py-1 bg-gray-700 rounded add-one-btn" data-id="${item.id}">+</button>
+            </div>
+        </div>
+    `).join("");
+
+    const count = warenkorb.reduce((sum, item) => sum + item.menge, 0);
+    const total = warenkorb.reduce((sum, item) => sum + item.preis * item.menge, 0);
+
+    warenkorbAnzahl.textContent = count;
+    warenkorbGesamt.textContent = `${total.toFixed(2)} €`;
+
+    warenkorb.forEach(item => {
+        const addBtn = warenkorbListe.querySelector(`.add-one-btn[data-id="${item.id}"]`);
+        const removeBtn = warenkorbListe.querySelector(`.remove-one-btn[data-id="${item.id}"]`);
+
+        if (addBtn) addBtn.addEventListener("click", () => mengeAendern(item.id, 1));
+        if (removeBtn) addBtn && removeBtn.addEventListener("click", () => mengeAendern(item.id, -1));
     });
-
-    closeEditModal();
-    ladeArtikel();
 }
 
-// INIT
+function mengeAendern(id, delta) {
+    const item = warenkorb.find(a => a.id === id);
+    if (!item) return;
+
+    item.menge += delta;
+
+    if (item.menge <= 0) {
+        warenkorb = warenkorb.filter(a => a.id !== id);
+    }
+
+    renderWarenkorb();
+}
+
+function warenkorbLeeren() {
+    warenkorb = [];
+    renderWarenkorb();
+}
+
+function openEditModal(artikel) {
+    editArtikelId = artikel.id;
+    document.getElementById("edit-name").value = artikel.bezeichnung ?? "";
+    document.getElementById("edit-preis").value = artikel.preis ?? 0;
+    document.getElementById("edit-bestand").value = artikel.bestand ?? 0;
+    document.getElementById("edit-kategorie").value = artikel.kategorie ?? "";
+    editModal.classList.remove("hidden");
+}
+
+function closeEditModal() {
+    editModal.classList.add("hidden");
+    editArtikelId = null;
+}
+
+async function saveArtikelUpdate() {
+    if (!editArtikelId) return;
+
+    const data = {
+        bezeichnung: document.getElementById("edit-name").value.trim(),
+        preis: parseFloat(document.getElementById("edit-preis").value),
+        bestand: parseInt(document.getElementById("edit-bestand").value, 10),
+        kategorie: document.getElementById("edit-kategorie").value.trim()
+    };
+
+    try {
+        const response = await fetch(`/api/artikel/${editArtikelId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            throw new Error("Artikel konnte nicht gespeichert werden");
+        }
+
+        closeEditModal();
+        await ladeArtikel();
+    } catch (error) {
+        alert("Fehler beim Speichern des Artikels.");
+        console.error(error);
+    }
+}
+
+async function bestellungAufgeben() {
+    const name = document.getElementById("kunde-name").value.trim();
+    const email = document.getElementById("kunde-email").value.trim();
+
+    if (!name || !email) {
+        alert("Bitte Name und E-Mail eingeben.");
+        return;
+    }
+
+    if (warenkorb.length === 0) {
+        alert("Dein Warenkorb ist leer.");
+        return;
+    }
+
+    try {
+        const namenTeile = name.split(" ");
+        const vorname = namenTeile[0] || name;
+        const nachname = namenTeile.slice(1).join(" ") || "-";
+
+        const kundenResponse = await fetch("/api/kunden", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                vorname,
+                nachname,
+                email
+            })
+        });
+
+        if (!kundenResponse.ok) {
+            throw new Error("Kunde konnte nicht angelegt werden");
+        }
+
+        const kunde = await kundenResponse.json();
+
+        const bestellungResponse = await fetch("/api/bestellungen", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                kunde_id: kunde.id,
+                status: "offen"
+            })
+        });
+
+        if (!bestellungResponse.ok) {
+            throw new Error("Bestellung konnte nicht angelegt werden");
+        }
+
+        warenkorbLeeren();
+        erfolgModal.classList.remove("hidden");
+    } catch (error) {
+        alert("Fehler beim Aufgeben der Bestellung.");
+        console.error(error);
+    }
+}
+
+function schliesseModal() {
+    erfolgModal.classList.add("hidden");
+}
+
+renderWarenkorb();
 ladeArtikel();
 </script>
 

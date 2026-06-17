@@ -1,20 +1,11 @@
-/* =========================
-   GLOBAL BASE
-   ========================= */
-
 body {
     margin: 0;
     font-family: Arial, sans-serif;
     background: #0f172a;
     color: white;
-
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-
-/* =========================
-   BUTTONS (enhanced)
-   ========================= */
 
 button {
     transition: all 0.2s ease-in-out;
@@ -24,30 +15,10 @@ button:hover {
     transform: translateY(-1px);
 }
 
-/* =========================
-   HEADER
-   ========================= */
-
 header {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 }
-
-/* =========================
-   NAV (falls genutzt)
-   ========================= */
-
-nav {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    padding: 15px;
-    background: #111827;
-}
-
-/* =========================
-   CARDS / ARTIKEL
-   ========================= */
 
 #artikel-grid > div {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -58,15 +29,10 @@ nav {
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
 }
 
-/* =========================
-   WARENKORB SIDEBAR
-   ========================= */
-
 #warenkorb-panel {
     backdrop-filter: blur(12px);
 }
 
-/* Slide animation */
 #warenkorb-panel.flex {
     animation: slideIn 0.2s ease-out;
 }
@@ -82,10 +48,6 @@ nav {
     }
 }
 
-/* =========================
-   MODALS (BESTELLUNG + EDIT)
-   ========================= */
-
 #erfolg-modal,
 #edit-modal {
     animation: fadeIn 0.2s ease-in-out;
@@ -96,7 +58,6 @@ nav {
     to { opacity: 1; }
 }
 
-/* Modal Box animation */
 #erfolg-modal > div,
 #edit-modal > div {
     animation: pop 0.2s ease forwards;
@@ -109,10 +70,6 @@ nav {
     }
 }
 
-/* =========================
-   INPUT FIELDS
-   ========================= */
-
 input {
     transition: all 0.2s ease;
 }
@@ -122,10 +79,6 @@ input:focus {
     outline: none;
 }
 
-/* =========================
-   WARENKORB ITEMS
-   ========================= */
-
 #warenkorb-liste > div {
     transition: background 0.2s ease;
 }
@@ -133,10 +86,6 @@ input:focus {
 #warenkorb-liste > div:hover {
     background: #2a3649;
 }
-
-/* =========================
-   SCROLLBAR (dark theme)
-   ========================= */
 
 ::-webkit-scrollbar {
     width: 8px;
@@ -152,5 +101,5 @@ input:focus {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #22c55e;
+    background: #14b8a6;
 }
